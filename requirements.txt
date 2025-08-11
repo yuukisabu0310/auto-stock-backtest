@@ -1,0 +1,7 @@
+pandas
+numpy
+yfinance
+backtesting
+pandas_ta
+matplotlib
+requests
