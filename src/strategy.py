@@ -1,5 +1,6 @@
 from backtesting import Strategy
-from backtesting.lib import SMA, crossover
+from backtesting.test import SMA
+from backtesting.lib import crossover
 import numpy as np
 
 def atr(h, l, c, n=14):
