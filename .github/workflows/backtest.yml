@@ -41,7 +41,7 @@ jobs:
           EXTRA_TICKERS:     ${{ vars.EXTRA_TICKERS || '' }}
           HOLDOUT_MONTHS:    ${{ vars.HOLDOUT_MONTHS || '12' }}
           OOS_FIXED_TICKERS: ${{ vars.OOS_FIXED_TICKERS || '' }}
-        run: python scripts/run_backtest.py
+        run: python -m scripts/run_backtest.py
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -56,4 +56,4 @@ jobs:
           SLACK_BOT_TOKEN:   ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL:     ${{ vars.SLACK_CHANNEL }}
           SLACK_MESSAGE:     "Daily backtest completed (JST)."
-        run: python scripts/notify_slack.py
+        run: python -m scripts/notify_slack.py
