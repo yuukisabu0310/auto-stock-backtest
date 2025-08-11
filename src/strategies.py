@@ -7,7 +7,8 @@ def atr(h, l, c, n=14):
     tr = np.maximum(h - l, np.maximum(abs(h - c.shift(1)), abs(l - c.shift(1))))
     return tr.rolling(n).mean()
 
-class FixedSma(Strategy):  # ← 名前をFixedSmaに
+# 戦略1: SmaCross
+class SmaCross(Strategy):
     n_fast = 20
     n_slow = 50
     target_vol_yr = 0.15
@@ -43,3 +44,8 @@ class FixedSma(Strategy):  # ← 名前をFixedSmaに
         elif crossover(self.sma_slow, self.sma_fast):
             if self.position.is_long:
                 self.position.close(limit=px)
+
+# 戦略2: FixedSma (SmaCrossを継承)
+class FixedSma(SmaCross):
+    """walkforward.pyなど固定パラメータ検証用"""
+    pass
