@@ -34,7 +34,11 @@ class SmaCross(Strategy):
             else:
                 size = 0
 
-        px = self.data.Close[-1] * (1 + self.slip_k_atr * (atr_val / self.data.Close[-1] if self.data.Close[-1] else 0))
+        px = self.data.Close[-1] * (
+            1 + self.slip_k_atr * (
+                atr_val / self.data.Close[-1] if self.data.Close[-1] else 0
+            )
+        )
 
         if crossover(self.sma_fast, self.sma_slow):
             if not self.position.is_long and size > 0:
