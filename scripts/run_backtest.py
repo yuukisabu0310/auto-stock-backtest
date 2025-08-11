@@ -9,16 +9,29 @@ from src.universe import split_universe
 from src.sampler import stratified_sample
 from src.metrics import robust_score, is_stable
 
-from src.strategies import FixedSma, SmaCross  # 複数戦略を追加
-
 HOLDOUT_MONTHS = int(os.getenv("HOLDOUT_MONTHS", "12"))
 
 def load_ohlcv(ticker, start="2005-01-01", end=None):
-    df = yf.download(ticker, start=start, end=end, auto_adjust=True, progress=False)
-    return df[['Open','High','Low','Close','Volume']].dropna()
+    """yfinanceで価格取得 + 必須カラム揃える"""
+    try:
+        df = yf.download(ticker, start=start, end=end, auto_adjust=True, progress=False)
+    except Exception as e:
+        print(f"[ERROR] {ticker} データ取得失敗: {e}")
+        return pd.DataFrame(columns=['Open','High','Low','Close','Volume'])
+
+    if df.empty:
+        return pd.DataFrame(columns=['Open','High','Low','Close','Volume'])
+
+    for col in ['Open','High','Low','Close','Volume']:
+        if col not in df.columns:
+            df[col] = pd.NA
+
+    df = df[['Open','High','Low','Close','Volume']].dropna()
+    return df
 
 def split_holdout(df: pd.DataFrame, months=12):
-    if df.empty: return df, pd.DataFrame()
+    if df.empty: 
+        return pd.DataFrame(), pd.DataFrame()
     cutoff = (df.index.max() - pd.DateOffset(months=months)).normalize()
     in_sample = df[df.index <= cutoff]
     holdout   = df[df.index >  cutoff]
@@ -31,18 +44,18 @@ def grid_candidates():
 
 def eval_params_on_ticker(args):
     tkr, df, nf, ns, strategy_class = args
-    res_df = run_walk_forward_fixed(df, n_fast=nf, n_slow=ns, strategy_class=strategy_class)
+    if df.empty or len(df) < 50:
+        return (tkr, (nf,ns), None)
+    res_df, _ = run_walk_forward_fixed(df, n_fast=nf, n_slow=ns, strategy_class=strategy_class)
     return (tkr, (nf,ns), res_df)
 
 def main():
-    # 戦略リスト（追加したい戦略はここに登録）
-    strategies = [
-        ("FixedSma", FixedSma),
-        ("SmaCross", SmaCross)
-    ]
+    from src.strategies import FixedSma, SmaCross
+    strategies = [("FixedSma", FixedSma), ("SmaCross", SmaCross)]
 
     fixed = [t.strip() for t in os.getenv("OOS_FIXED_TICKERS","").split(",") if t.strip()]
     extra = [t.strip() for t in os.getenv("EXTRA_TICKERS","").split(",") if t.strip()]
+
     non_ai, ai = split_universe(extra)
 
     SAMPLE_SIZE   = int(os.getenv("SAMPLE_SIZE", "12"))
@@ -56,6 +69,7 @@ def main():
 
     learn_pool = sorted(set(non_ai) - set(fixed))
     learn_list = stratified_sample(learn_pool, SAMPLE_SIZE, seed=random.random())
+
     oos_pool = sorted(set(learn_pool) - set(learn_list) - set(fixed))
     rand_oos = stratified_sample(oos_pool, OOS_RANDOM_SZ, seed=random.random())
     oos_all = sorted(set(rand_oos).union(set(fixed)))
@@ -64,7 +78,6 @@ def main():
     print(f"[OOS fixed] {fixed}")
     print(f"[OOS random] {rand_oos}")
 
-    # 価格キャッシュ
     price_cache_in, price_cache_ho = {}, {}
     for t in sorted(set(learn_list + oos_all)):
         full = load_ohlcv(t)
@@ -72,20 +85,29 @@ def main():
         price_cache_in[t] = ins
         price_cache_ho[t] = ho
 
-    cand = grid_candidates()
-
-    # 各戦略ごとに処理
     for strat_name, strat_class in strategies:
         print(f"\n===== 戦略 {strat_name} の処理開始 =====")
 
-        # パラメータ探索
-        tasks = [(t, price_cache_in[t], nf, ns, strat_class) for t in learn_list for (nf,ns) in cand]
+        cand = grid_candidates()
+        tasks = []
+        for t in learn_list:
+            df_in = price_cache_in[t]
+            if df_in.empty or len(df_in) < 50:
+                print(f"[WARN] {t} はデータ不足のためスキップ")
+                continue
+            for nf, ns in cand:
+                tasks.append((t, df_in, nf, ns, strat_class))
+
+        if not tasks:
+            print(f"[ERROR] 学習用データがありません ({strat_name})")
+            continue
+
         with Pool(min(max(1,cpu_count()-1), 6)) as p:
             results = p.map(eval_params_on_ticker, tasks)
 
         df_map = {}
         for (tkr, param, res_df) in results:
-            if res_df is None or (isinstance(res_df, pd.DataFrame) and res_df.empty):
+            if res_df is None or res_df.empty: 
                 continue
             df_map.setdefault(param, []).append(res_df)
 
@@ -95,7 +117,7 @@ def main():
             scored.append((param, robust_score(all_df), all_df))
 
         if not scored:
-            print(f"[{strat_name}] 学習セットでスコアが計算できませんでした。")
+            print(f"[ERROR] スコア計算できません ({strat_name})")
             continue
 
         def neighbors(p):
@@ -120,18 +142,21 @@ def main():
             best_tuple, best_score, best_df_all = max(scored, key=lambda x:x[1])[0:3]
 
         best_nf, best_ns = best_tuple
-        print(f"[{strat_name}] best params: n_fast={best_nf}, n_slow={best_ns}, score={best_score:.4f} (stable)")
+        print(f"[best params] n_fast={best_nf}, n_slow={best_ns}, score={best_score:.4f} (stable)")
 
-        # 評価
+        # 戦略別フォルダ作成
+        strat_dir = os.path.join("reports", strat_name)
+        os.makedirs(strat_dir, exist_ok=True)
+
         def eval_group(tickers, label, use_holdout=False):
             rows = []
             for t in tickers:
                 df = price_cache_ho[t] if use_holdout else price_cache_in[t]
-                if df is None or df.empty:
+                if df.empty or len(df) < 50:
                     rows.append({"ticker":t, "label":label, "folds":0})
                     continue
-                res_df = run_walk_forward_fixed(df, n_fast=best_nf, n_slow=best_ns, strategy_class=strat_class)
-                save_outputs(f"{strat_name}/{t}_{label}", res_df, None)
+                res_df, eq = run_walk_forward_fixed(df, n_fast=best_nf, n_slow=best_ns, strategy_class=strat_class)
+                save_outputs(os.path.join(strat_dir, f"{t}_{label}"), res_df, eq)
                 rows.append({**summarize(res_df), "ticker":t, "label":label})
             return pd.DataFrame(rows)
 
@@ -141,14 +166,14 @@ def main():
         df_ho_fixed  = eval_group(fixed,    "HOLDOUT_fixed",  use_holdout=True)
 
         out = pd.concat([df_oos_nonai, df_oos_fixed, df_ho_nonai, df_ho_fixed], ignore_index=True)
-        os.makedirs(f"reports/{strat_name}", exist_ok=True)
-        out.to_csv(f"reports/{strat_name}/_all_summary.csv", index=False)
-        with open(f"reports/{strat_name}/_params.txt","w",encoding="utf-8") as f:
+        out.to_csv(os.path.join(strat_dir, "_all_summary.csv"), index=False)
+
+        with open(os.path.join(strat_dir, "_params.txt"),"w",encoding="utf-8") as f:
             f.write(f"best_n_fast={best_nf}\nbest_n_slow={best_ns}\nscore={best_score:.6f}\n")
             f.write(f"learn_nonAI={learn_list}\nOOS_fixed={fixed}\nOOS_random={rand_oos}\n")
             f.write(f"holdout_months={HOLDOUT_MONTHS}\n")
 
-        print(f"[{strat_name}] Backtest done. Reports in ./reports/{strat_name}")
+        print(f"[{strat_name}] Backtest done. Reports in {strat_dir}")
 
 if __name__ == "__main__":
     main()
