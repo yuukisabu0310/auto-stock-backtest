@@ -7,7 +7,7 @@ def atr(h, l, c, n=14):
     tr = np.maximum(h - l, np.maximum(abs(h - c.shift(1)), abs(l - c.shift(1))))
     return tr.rolling(n).mean()
 
-class SmaCross(Strategy):
+class FixedSma(Strategy):  # ← 名前をFixedSmaに
     n_fast = 20
     n_slow = 50
     target_vol_yr = 0.15
@@ -34,11 +34,7 @@ class SmaCross(Strategy):
             else:
                 size = 0
 
-        px = self.data.Close[-1] * (
-            1 + self.slip_k_atr * (
-                atr_val / self.data.Close[-1] if self.data.Close[-1] else 0
-            )
-        )
+        px = self.data.Close[-1] * (1 + self.slip_k_atr * (atr_val / self.data.Close[-1] if self.data.Close[-1] else 0))
 
         if crossover(self.sma_fast, self.sma_slow):
             if not self.position.is_long and size > 0:
