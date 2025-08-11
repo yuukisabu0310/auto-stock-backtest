@@ -1,46 +1,42 @@
 import pandas as pd
 from backtesting import Backtest
-from .strategy import SmaCross
+from src.strategies import FixedSma
 
-def walk_forward_slices(index, train_years=5, test_years=1, step_years=1):
-    i0, i1 = index.min(), index.max()
-    cur = pd.Timestamp(i0)
-    out = []
-    while True:
-        train_end = cur + pd.DateOffset(years=train_years) - pd.Timedelta(days=1)
-        test_end  = train_end + pd.DateOffset(years=test_years)
-        if test_end > i1:
-            break
-        out.append((cur, train_end, train_end + pd.Timedelta(days=1), test_end))
-        cur = cur + pd.DateOffset(years=step_years)
-    return out
+def run_walk_forward_fixed(df, n_fast=10, n_slow=20, cash=10_000, commission=.002):
+    """
+    与えられた DataFrame に対して Walk Forward 検証を行う関数
+    複数銘柄対応（1銘柄ずつ処理前提）、MultiIndex解除とカラム整形を追加
+    """
 
-def run_walk_forward_fixed(df, n_fast:int, n_slow:int, cash=100_000, commission=0.001):
-    class FixedSma(SmaCross):
-        pass
-    FixedSma.n_fast = n_fast
-    FixedSma.n_slow = n_slow
+    # MultiIndex（階層化カラム）の場合は解除（例：yfinanceでgroup_by='ticker'取得時）
+    if isinstance(df.columns, pd.MultiIndex):
+        df.columns = df.columns.droplevel(0)
 
-    windows = walk_forward_slices(df.index)
-    rows, equity_parts = [], []
+    # 必要カラムのみに揃える（順番保証）
+    required_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
+    missing_cols = [c for c in required_cols if c not in df.columns]
+    if missing_cols:
+        raise ValueError(f"DataFrame に必要なカラムが不足しています: {missing_cols}")
 
-    for (tr_s, tr_e, te_s, te_e) in windows:
-        train = df.loc[tr_s:tr_e].copy()
-        test  = df.loc[te_s:te_e].copy()
-        if len(train) < 200 or len(test) < 50:
-            continue
+    df = df[required_cols]
 
-        bt_test = Backtest(test, FixedSma, cash=cash, commission=commission, exclusive_orders=True)
-        st = bt_test.run()
-        st['train_start'], st['train_end'] = tr_s.date(), tr_e.date()
-        st['test_start'],  st['test_end']  = te_s.date(), te_e.date()
-        st['n_fast'], st['n_slow'] = n_fast, n_slow
-        rows.append(st)
+    # Walk Forward 検証本体
+    bt_test = Backtest(df, FixedSma, cash=cash, commission=commission, exclusive_orders=True)
+    stats = bt_test.run()
+    return stats
 
-        eq = st['_equity_curve'][['Equity']].copy()
-        eq.index = test.index[:len(eq)]
-        equity_parts.append(eq)
-
-    res_df = pd.DataFrame(rows) if rows else pd.DataFrame()
-    equity = pd.concat(equity_parts) if equity_parts else pd.DataFrame()
-    return res_df, equity
+def run_walk_forward_params(df, params_list, cash=10_000, commission=.002):
+    """
+    複数のパラメータセットに対して Walk Forward 検証を行う
+    """
+    results = []
+    for params in params_list:
+        n_fast = params.get("n_fast", 10)
+        n_slow = params.get("n_slow", 20)
+        stats = run_walk_forward_fixed(df, n_fast=n_fast, n_slow=n_slow, cash=cash, commission=commission)
+        results.append({
+            "n_fast": n_fast,
+            "n_slow": n_slow,
+            **stats
+        })
+    return pd.DataFrame(results)
