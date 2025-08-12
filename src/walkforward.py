@@ -1,100 +1,74 @@
 import pandas as pd
 from backtesting import Backtest
 
-def walk_forward_slices(index, train_years=5, test_years=1, step_years=1):
-    """年単位で WFO のトレイン/テスト窓を作成"""
-    i0, i1 = index.min(), index.max()
-    cur = pd.Timestamp(i0)
-    out = []
-    while True:
-        train_end = cur + pd.DateOffset(years=train_years) - pd.Timedelta(days=1)
-        test_end  = train_end + pd.DateOffset(years=test_years)
-        if test_end > i1:
-            break
-        out.append((cur, train_end, train_end + pd.Timedelta(days=1), test_end))
-        cur = cur + pd.DateOffset(years=step_years)
-    return out
+def run_walk_forward_fixed(
+    df,
+    n_fast=10,
+    n_slow=20,
+    cash=10_000,
+    commission=.002,
+    strategy_class=None,
+    ticker="UNKNOWN"
+):
+    """
+    与えられた DataFrame に対して Walk Forward 検証を行う関数
+    複数銘柄対応 / カラム補完 / 取引ゼロでも返却
+    """
 
-def _prepare_ohlcv(df: pd.DataFrame) -> pd.DataFrame:
-    # MultiIndex -> 単層化
+    # MultiIndex（階層化カラム）の場合は解除（例：yfinance group_by='ticker'）
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.droplevel(0)
-    # 必須カラムを揃える
-    required = ['Open', 'High', 'Low', 'Close', 'Volume']
-    for c in required:
-        if c not in df.columns:
-            df[c] = pd.NA
-    df = df[required].dropna()
-    # backtesting.py は DatetimeIndex を期待
-    if not isinstance(df.index, pd.DatetimeIndex):
-        try:
-            df.index = pd.to_datetime(df.index)
-        except Exception:
-            pass
-    return df
 
-def run_walk_forward_fixed(df: pd.DataFrame,
-                           n_fast: int = 10,
-                           n_slow: int = 20,
-                           strategy_class=None,
-                           cash: float = 100_000,
-                           commission: float = .002,
-                           train_years: int = 5,
-                           test_years: int = 1,
-                           step_years: int = 1):
-    """
-    与えられた日足DFに対して Walk-Forward（OOS）検証を実行し、
-    各フォールドの stats を縦結合した DataFrame と、OOSのエクイティ曲線を返す。
+    # 必要カラムの補完
+    required_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
+    for col in required_cols:
+        if col not in df.columns:
+            df[col] = pd.NA
+    df = df[required_cols].dropna()
 
-    戻り値:
-      res_df: 各フォールドの backtesting.Stats を行として結合した DataFrame
-      equity: OOS期間を連結した資産曲線（DateIndex, 'Equity' の1列）
-    """
-    if strategy_class is None:
-        raise ValueError("strategy_class を指定してください")
+    print(f"[DEBUG] {ticker}: n_fast={n_fast}, n_slow={n_slow}, rows={len(df)}")
 
-    df = _prepare_ohlcv(df)
-    if df.empty or len(df) < 50:
-        return pd.DataFrame(), pd.DataFrame()
+    if df.empty or len(df) < max(n_fast, n_slow) + 10:
+        print(f"[WARN] {ticker}: データ不足でスキップ ({len(df)}行)")
+        return pd.DataFrame([{"ticker": ticker, "n_fast": n_fast, "n_slow": n_slow, "trades": 0}]), None
 
-    # ← 重要：stats を返す前提。トレードが0でも stats は返る。
-    windows = walk_forward_slices(df.index, train_years, test_years, step_years)
-    rows, equity_parts = [], []
+    # Walk Forward 検証本体
+    try:
+        bt_test = Backtest(
+            df,
+            strategy_class,
+            cash=cash,
+            commission=commission,
+            exclusive_orders=True
+        )
+        stats = bt_test.run(n_fast=n_fast, n_slow=n_slow)
 
-    # backtesting.run の kwargs でパラメータを渡す（インスタンス属性に反映される）
-    run_kwargs = dict(n_fast=n_fast, n_slow=n_slow)
+        # 取引がない場合の対応
+        trades = getattr(stats, "_trades", None)
+        if trades is None or trades.empty:
+            print(f"[INFO] {ticker}: 取引なし ({n_fast},{n_slow})")
+            return pd.DataFrame([{
+                "ticker": ticker,
+                "n_fast": n_fast,
+                "n_slow": n_slow,
+                "trades": 0
+            }]), bt_test.equity_curve
 
-    for (tr_s, tr_e, te_s, te_e) in windows:
-        train = df.loc[tr_s:tr_e]
-        test  = df.loc[te_s:te_e]
-        # 最低限の長さを確保
-        if len(train) < 200 or len(test) < 50:
-            continue
+        # tradesがある場合はDataFrame化
+        trades_df = trades.copy()
+        trades_df["ticker"] = ticker
+        trades_df["n_fast"] = n_fast
+        trades_df["n_slow"] = n_slow
+        trades_df["trades"] = len(trades_df)
 
-        bt = Backtest(test, strategy_class, cash=cash, commission=commission, exclusive_orders=True)
-        st = bt.run(**run_kwargs)  # <- Sharpe/Return[%]/Trades 等を含む Stats
+        return trades_df, bt_test.equity_curve
 
-        # 行に識別用メタを付与
-        st['train_start'], st['train_end'] = tr_s.date(), tr_e.date()
-        st['test_start'],  st['test_end']  = te_s.date(), te_e.date()
-        st['n_fast'], st['n_slow'] = n_fast, n_slow
-        rows.append(st)
-
-        # OOSエクイティ（存在すれば）
-        eq = getattr(st, "_equity_curve", None)
-        if eq is None:
-            # backtesting>=0.4 では bt._equity_curve にある
-            try:
-                eq = bt._equity_curve[['Equity']].copy()
-            except Exception:
-                eq = None
-        if eq is not None and not eq.empty:
-            # テスト期間の index を付け直す（安全のため）
-            eq = eq[['Equity']].copy()
-            if not isinstance(eq.index, pd.DatetimeIndex):
-                eq.index = test.index[:len(eq)]
-            equity_parts.append(eq)
-
-    res_df = pd.DataFrame(rows) if rows else pd.DataFrame()
-    equity = pd.concat(equity_parts) if equity_parts else pd.DataFrame()
-    return res_df, equity
+    except Exception as e:
+        print(f"[ERROR] {ticker}: Backtest失敗 ({n_fast},{n_slow}) - {e}")
+        return pd.DataFrame([{
+            "ticker": ticker,
+            "n_fast": n_fast,
+            "n_slow": n_slow,
+            "trades": 0,
+            "error": str(e)
+        }]), None
