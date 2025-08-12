@@ -51,7 +51,7 @@ jobs:
           HOLDOUT_MONTHS:    12
         run: python -m scripts.run_backtest
 
-      # 6. スマホ向け index.html を生成
+      # 6. スマホ向け index.html を生成 
       - name: Build mobile index (reports/index.html)
         run: python -m scripts.make_index
 
@@ -71,7 +71,7 @@ jobs:
         env:
           SLACK_BOT_TOKEN:  ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL:    ${{ secrets.SLACK_CHANNEL }}
-          SLACK_WEBHOOK_URL:${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_MESSAGE:    "Backtest finished (JST)."
         run: python -m scripts.notify_slack
 
