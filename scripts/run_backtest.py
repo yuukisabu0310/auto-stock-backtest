@@ -11,26 +11,86 @@ from src.metrics import robust_score, is_stable
 
 HOLDOUT_MONTHS = int(os.getenv("HOLDOUT_MONTHS", "12"))
 
+def _normalize_ohlcv_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """yfinanceの戻りの列を正規化（MultiIndex解除、大小文字揺れ、最小補完）"""
+    if df is None or df.empty:
+        return pd.DataFrame()
+
+    # MultiIndex -> 単層
+    if isinstance(df.columns, pd.MultiIndex):
+        # 一般的には最上位がティッカー名なのでドロップ
+        try:
+            df.columns = df.columns.droplevel(0)
+        except Exception:
+            # ドロップできなくても後続の正規化で対応
+            pass
+
+    # 列名の大小文字ゆれを吸収
+    ren = {c: c.strip().lower() for c in df.columns}
+    df = df.rename(columns=ren)
+
+    # 期待キー
+    has_close = "close" in df.columns
+    has_open  = "open"  in df.columns
+    has_high  = "high"  in df.columns
+    has_low   = "low"   in df.columns
+    has_vol   = "volume" in df.columns
+
+    # Close が無い場合は致命的 → ゼロ件扱い
+    if not has_close:
+        return pd.DataFrame()
+
+    # OHLC の欠損は Close で補完（最低限動かすためのフォールバック）
+    if not has_open: df["open"] = df["close"]
+    if not has_high: df["high"] = df["close"]
+    if not has_low:  df["low"]  = df["close"]
+    if not has_vol:  df["volume"] = 0
+
+    # 列の並びを保証
+    df = df[["open","high","low","close","volume"]].copy()
+
+    # Index を Datetime に
+    if not isinstance(df.index, pd.DatetimeIndex):
+        df.index = pd.to_datetime(df.index, errors="coerce")
+    df = df[~df.index.isna()]
+
+    # 価格の前日補間（念のため）
+    df[["open","high","low","close"]] = df[["open","high","low","close"]].ffill()
+    # volume 欠損は 0
+    df["volume"] = df["volume"].fillna(0)
+
+    # タイトルケースに戻す（以降の処理が ['Open',...] 前提のため）
+    df = df.rename(columns={
+        "open":"Open","high":"High","low":"Low","close":"Close","volume":"Volume"
+    })
+    return df
+
 def load_ohlcv(ticker, start="2005-01-01", end=None):
-    """yfinanceで価格取得 + 必須カラム揃える + ログ出力"""
+    """yfinanceで価格取得 + 列正規化 + 最小補完 + ログ出力"""
     try:
-        df = yf.download(ticker, start=start, end=end, auto_adjust=True, progress=False, threads=False)
+        df = yf.download(
+            ticker, start=start, end=end,
+            auto_adjust=True, progress=False, threads=False
+        )
     except Exception as e:
         print(f"[ERROR] {ticker} データ取得失敗: {e}")
         return pd.DataFrame(columns=['Open','High','Low','Close','Volume'])
 
-    if df.empty:
+    if df is None or df.empty:
         print(f"[ERROR] {ticker} → データ取得0件")
         return pd.DataFrame(columns=['Open','High','Low','Close','Volume'])
 
-    # 必須カラム補完
-    for col in ['Open','High','Low','Close','Volume']:
-        if col not in df.columns:
-            print(f"[WARN] {ticker} → 欠損カラム {col} をNaNで補完")
-            df[col] = pd.NA
+    df = _normalize_ohlcv_columns(df)
 
-    # カラム順 + 最低限の欠損除去
-    df = df[['Open','High','Low','Close','Volume']].dropna(subset=['Open','High','Low','Close'])
+    if df.empty:
+        print(f"[ERROR] {ticker} → 列正規化後もデータ0件（Close 欠損など）")
+        return pd.DataFrame(columns=['Open','High','Low','Close','Volume'])
+
+    # ごく基本の品質フィルタ（価格が still NaN のものは落とす）
+    df = df.dropna(subset=['Open','High','Low','Close'])
+    if df.empty:
+        print(f"[ERROR] {ticker} → 欠損除去後データ0件")
+        return pd.DataFrame(columns=['Open','High','Low','Close','Volume'])
 
     print(f"[INFO] {ticker} データ取得成功: {len(df)}件")
     return df
@@ -53,7 +113,10 @@ def eval_params_on_ticker(args):
     if df.empty or len(df) < 20:  # 最低20営業日
         print(f"[SKIP] {tkr} データ不足（{len(df)}件）")
         return (tkr, (nf,ns), None)
-    res_df, _ = run_walk_forward_fixed(df, n_fast=nf, n_slow=ns, strategy_class=strategy_class, ticker=tkr)
+    res_df, _ = run_walk_forward_fixed(
+        df, n_fast=nf, n_slow=ns,
+        strategy_class=strategy_class, ticker=tkr
+    )
     return (tkr, (nf,ns), res_df)
 
 def main():
@@ -168,8 +231,11 @@ def main():
                 if df.empty or len(df) < 20:
                     rows.append({"ticker":t, "label":label, "folds":0})
                     continue
-                res_df, eq = run_walk_forward_fixed(df, n_fast=best_nf, n_slow=best_ns, strategy_class=strat_class, ticker=t)
-                # eq は None ではなく必ず DataFrame（空でOK）
+                res_df, eq = run_walk_forward_fixed(
+                    df, n_fast=best_nf, n_slow=best_ns,
+                    strategy_class=strat_class, ticker=t
+                )
+                # eq は必ず DataFrame（空でOK）
                 save_outputs(os.path.join(strat_dir, f"{t}_{label}"), res_df, eq)
                 rows.append({**summarize(res_df), "ticker":t, "label":label})
             return pd.DataFrame(rows)
