@@ -1,59 +1,141 @@
-name: backtest-daily
+name: Auto Backtest (Daily + Pages)
 
 on:
-  schedule:
-    - cron: '0 22 * * *'  # 07:00 JST
   workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"   # 毎日UTC0時（JST 09:00）
+
+# Pages デプロイに必要
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   backtest:
     runs-on: ubuntu-latest
+
+    env:
+      # 任意: デフォルト値（必要に応じてリポジトリの "Variables" で上書き可能）
+      SAMPLE_SIZE: 12
+      OOS_RANDOM_SIZE: 8
+      HOLDOUT_MONTHS: 12
+      SLACK_FETCH_LIMIT: 50
+      # 例: SLACK_CONFIG_CHANNEL は #oos-config などを "Repository variables" に設定推奨
+      SLACK_CONFIG_CHANNEL: ${{ vars.SLACK_CONFIG_CHANNEL }}
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-          cache: 'pip'
+          python-version: "3.11"
 
-      - name: Install deps
-        run: pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip
+          pip install -r requirements.txt
 
+      # --- (任意) Slack から最新の OOS 指定銘柄を取得して環境変数へ ---
       - name: Fetch OOS tickers from Slack
+        id: fetch_oos
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CONFIG_CHANNEL: ${{ secrets.SLACK_CONFIG_CHANNEL }}
+          SLACK_CONFIG_CHANNEL: ${{ env.SLACK_CONFIG_CHANNEL }}
+          SLACK_FETCH_LIMIT: ${{ env.SLACK_FETCH_LIMIT }}
         run: |
-          python -m scripts.fetch_oos_from_slack > /tmp/oos.txt || true
-          OOS=$(cat /tmp/oos.txt || true)
-          if [ -n "$OOS" ]; then
-            echo "OOS_FIXED_TICKERS=$OOS" >> $GITHUB_ENV
-            echo "Using OOS_FIXED_TICKERS from Slack: $OOS"
-          else
-            echo "No OOS override from Slack. Using existing variables."
-          fi
+          python -m fetch_oos_from_slack > oos.txt || true
+          echo "OOS_FIXED_TICKERS=$(cat oos.txt)" >> $GITHUB_ENV
+          echo "Fetched OOS_FIXED_TICKERS=$(cat oos.txt)"
 
+      # --- バックテスト本体 ---
       - name: Run backtest
         env:
-          SAMPLE_SIZE:       ${{ vars.SAMPLE_SIZE || '12' }}
-          OOS_RANDOM_SIZE:   ${{ vars.OOS_RANDOM_SIZE || '8' }}
-          RANDOM_SEED:       ${{ vars.RANDOM_SEED || '' }}
-          EXTRA_TICKERS:     ${{ vars.EXTRA_TICKERS || '' }}
-          HOLDOUT_MONTHS:    ${{ vars.HOLDOUT_MONTHS || '12' }}
-          OOS_FIXED_TICKERS: ${{ vars.OOS_FIXED_TICKERS || '' }}
-        run: python -m scripts.run_backtest
+          OOS_FIXED_TICKERS: ${{ env.OOS_FIXED_TICKERS }}
+          EXTRA_TICKERS:     ${{ vars.EXTRA_TICKERS }}     # 追加ティッカー（任意）
+          SAMPLE_SIZE:       ${{ env.SAMPLE_SIZE }}
+          OOS_RANDOM_SIZE:   ${{ env.OOS_RANDOM_SIZE }}
+          HOLDOUT_MONTHS:    ${{ env.HOLDOUT_MONTHS }}
+        run: |
+          python -m run_backtest
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+      # --- スマホ向けインデックス（reports/index.html）を生成 ---
+      - name: Build mobile index (reports/index.html)
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from html import escape
+          ROOT = Path("reports")
+          ROOT.mkdir(parents=True, exist_ok=True)
+
+          def li(p: Path) -> str:
+              return f"<li><a href='{escape(p.as_posix())}'>{escape(p.name)}</a></li>"
+
+          parts = []
+          parts.append("<!doctype html><html><head>")
+          parts.append("<meta charset='utf-8'>")
+          parts.append("<meta name='viewport' content='width=device-width,initial-scale=1'>")
+          parts.append("<title>Backtest Reports</title>")
+          parts.append("<style>body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;padding:16px;line-height:1.6}h1{font-size:20px}h2{font-size:18px;margin-top:18px}ul{padding-left:18px}a{word-break:break-all}</style>")
+          parts.append("</head><body><h1>Backtest Reports</h1>")
+
+          for d in sorted([p for p in ROOT.iterdir() if p.is_dir()]):
+              files = sorted(d.glob("*"))
+              if not files: 
+                  continue
+              parts.append(f"<h2>{escape(d.name)}</h2><ul>")
+              for name in ["_params.txt","_all_summary.csv"]:
+                  fp = d / name
+                  if fp.exists(): parts.append(li(fp))
+              for f in files:
+                  if f.name in ["_params.txt","_all_summary.csv"]: 
+                      continue
+                  parts.append(li(f))
+              parts.append("</ul>")
+
+          root_files = [p for p in ROOT.iterdir() if p.is_file()]
+          if root_files:
+              parts.append("<h2>Others</h2><ul>")
+              for f in sorted(root_files): parts.append(li(f))
+              parts.append("</ul>")
+
+          parts.append("</body></html>")
+          (ROOT / "index.html").write_text("\n".join(parts), encoding="utf-8")
+          print("reports/index.html generated")
+          PY
+
+      # --- GitHub Pages へ公開（reports/ を静的サイトとして配信） ---
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: reports
-          path: reports/**
+          path: reports
 
-      - name: Slack notify
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # --- (任意) Slack へ結果を通知（PNG/CSV/TXT を添付） ---
+      - name: Notify to Slack
         if: always()
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_BOT_TOKEN:   ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL:     ${{ vars.SLACK_CHANNEL }}
-          SLACK_MESSAGE:     "Daily backtest completed (JST)."
-        run: python -m scripts.notify_slack
+          SLACK_BOT_TOKEN:  ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL:    ${{ secrets.SLACK_CHANNEL }}     # 例: CXXXXXXXX or #channel
+          SLACK_WEBHOOK_URL:${{ secrets.SLACK_WEBHOOK_URL }} # 任意（テキストだけのWebhook用）
+          SLACK_MESSAGE:    "Backtest finished (JST)."
+        run: |
+          python -m notify_slack
+
+      # --- (任意) レポートをArtifactsとして保存（保険＆一括DL） ---
+      - name: Upload reports as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backtest-reports
+          path: reports/
