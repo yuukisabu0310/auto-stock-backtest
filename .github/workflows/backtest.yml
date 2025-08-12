@@ -127,7 +127,7 @@ jobs:
         env:
           SLACK_BOT_TOKEN:  ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL:    ${{ secrets.SLACK_CHANNEL }}     # 例: CXXXXXXXX or #channel
-          SLACK_WEBHOOK_URL:${{ secrets.SLACK_WEBHOOK_URL }} # 任意（テキストだけのWebhook用）
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # 任意（テキストだけのWebhook用）
           SLACK_MESSAGE:    "Backtest finished (JST)."
         run: |
           python -m notify_slack
