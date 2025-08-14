@@ -19,7 +19,9 @@ def walk_forward_slices(index, train_years=5, test_years=1, step_years=1):
 def _prepare_ohlcv(df: pd.DataFrame) -> pd.DataFrame:
     # MultiIndex -> 単層
     if isinstance(df.columns, pd.MultiIndex):
-        df.columns = df.columns.droplevel(0)
+        # yfinanceの戻り値は ('Close', 'AAPL') のような形式
+        # 最初の要素（OHLCV名）を取得
+        df.columns = [col[0] if isinstance(col, tuple) else col for col in df.columns]
 
     req = ['Open','High','Low','Close','Volume']
     for c in req:
@@ -89,7 +91,7 @@ def run_walk_forward_fixed(
         if len(train) < max(n_fast, n_slow) + 10 or len(test) < 40:  # 最低限
             continue
 
-        bt = Backtest(test, strategy_class, cash=cash, commission=commission, exclusive_orders=True)
+        bt = Backtest(test, strategy_class, cash=cash, commission=commission, exclusive_orders=True, finalize_trades=True)
         stats = bt.run(**run_kwargs)  # pandas.Series（Sharpe Ratio, Return[%], Trades など）
 
         # サマリーSeries -> 1行にして蓄積

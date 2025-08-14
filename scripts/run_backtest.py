@@ -18,9 +18,10 @@ def _normalize_ohlcv_columns(df: pd.DataFrame) -> pd.DataFrame:
 
     # MultiIndex -> 単層
     if isinstance(df.columns, pd.MultiIndex):
-        # 一般的には最上位がティッカー名なのでドロップ
+        # yfinanceの戻り値は ('Close', 'AAPL') のような形式
+        # 最初の要素（OHLCV名）を取得
         try:
-            df.columns = df.columns.droplevel(0)
+            df.columns = [col[0] if isinstance(col, tuple) else col for col in df.columns]
         except Exception:
             # ドロップできなくても後続の正規化で対応
             pass
@@ -236,7 +237,7 @@ def main():
                     strategy_class=strat_class, ticker=t
                 )
                 # eq は必ず DataFrame（空でOK）
-                save_outputs(os.path.join(strat_dir, f"{t}_{label}"), res_df, eq)
+                save_outputs(f"{t}_{label}", res_df, eq, out_dir=strat_dir)
                 rows.append({**summarize(res_df), "ticker":t, "label":label})
             return pd.DataFrame(rows)
 

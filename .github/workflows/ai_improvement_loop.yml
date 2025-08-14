@@ -1,0 +1,283 @@
+name: AI Improvement Loop
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: '実行モード'
+        required: true
+        default: 'verification'
+        type: choice
+        options:
+          - verification
+          - adoption
+      strategy:
+        description: '改善対象戦略（空欄で全戦略）'
+        required: false
+        type: string
+      force_improvement:
+        description: '強制改善実行'
+        required: false
+        default: false
+        type: boolean
+  schedule:
+    - cron: '0 2 * * *' # 毎日JST11時（UTC2時）に検証モードで実行
+
+jobs:
+  ai-improvement:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+      pull-requests: write
+
+    steps:
+      # 1. リポジトリ取得
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # 2. Pythonセットアップ
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # 3. 依存パッケージインストール
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4. 実行モードの設定
+      - name: Set execution mode
+        id: mode
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "mode=${{ github.event.inputs.mode }}" >> $GITHUB_ENV
+            echo "strategy=${{ github.event.inputs.strategy }}" >> $GITHUB_ENV
+            echo "force_improvement=${{ github.event.inputs.force_improvement }}" >> $GITHUB_ENV
+          else
+            echo "mode=verification" >> $GITHUB_ENV
+            echo "strategy=" >> $GITHUB_ENV
+            echo "force_improvement=false" >> $GITHUB_ENV
+          fi
+
+      # 5. ブランチ作成（検証モードの場合）
+      - name: Create verification branch
+        if: env.mode == 'verification'
+        run: |
+          BRANCH_NAME="ai-improvement-$(date +%Y%m%d-%H%M%S)"
+          echo "branch_name=$BRANCH_NAME" >> $GITHUB_ENV
+          git checkout -b $BRANCH_NAME
+          git push origin $BRANCH_NAME
+
+      # 6. 現在のパフォーマンス測定
+      - name: Run current performance baseline
+        id: baseline
+        env:
+          OOS_FIXED_TICKERS: ${{ env.OOS_FIXED_TICKERS }}
+          EXTRA_TICKERS: ${{ vars.EXTRA_TICKERS }}
+          SAMPLE_SIZE: 12
+          OOS_RANDOM_SIZE: 8
+          HOLDOUT_MONTHS: 12
+        run: |
+          python -m scripts.run_backtest_enhanced --baseline-only
+          echo "baseline_completed=true" >> $GITHUB_ENV
+
+      # 7. AI改善提案生成
+      - name: Generate AI improvement proposals
+        id: proposals
+        run: |
+          python -m scripts.generate_improvements \
+            --mode ${{ env.mode }} \
+            --strategy "${{ env.strategy }}" \
+            --force ${{ env.force_improvement }}
+          
+          if [ -f "improvement_proposals.json" ]; then
+            echo "proposals_generated=true" >> $GITHUB_ENV
+            echo "proposal_count=$(jq length improvement_proposals.json)" >> $GITHUB_ENV
+          else
+            echo "proposals_generated=false" >> $GITHUB_ENV
+            echo "proposal_count=0" >> $GITHUB_ENV
+          fi
+
+      # 8. 改善提案のテスト実行
+      - name: Test improvement proposals
+        if: steps.proposals.outputs.proposals_generated == 'true'
+        id: testing
+        env:
+          OOS_FIXED_TICKERS: ${{ env.OOS_FIXED_TICKERS }}
+          EXTRA_TICKERS: ${{ vars.EXTRA_TICKERS }}
+          SAMPLE_SIZE: 12
+          OOS_RANDOM_SIZE: 8
+          HOLDOUT_MONTHS: 12
+        run: |
+          python -m scripts.test_improvements \
+            --mode ${{ env.mode }} \
+            --branch-name ${{ env.branch_name }}
+          
+          echo "testing_completed=true" >> $GITHUB_ENV
+
+      # 9. 改善結果の評価
+      - name: Evaluate improvement results
+        if: steps.testing.outputs.testing_completed == 'true'
+        id: evaluation
+        run: |
+          python -m scripts.evaluate_improvements \
+            --mode ${{ env.mode }} \
+            --branch-name ${{ env.branch_name }}
+          
+          if [ -f "evaluation_results.json" ]; then
+            echo "evaluation_completed=true" >> $GITHUB_ENV
+            echo "successful_improvements=$(jq '.successful_improvements | length' evaluation_results.json)" >> $GITHUB_ENV
+          else
+            echo "evaluation_completed=false" >> $GITHUB_ENV
+            echo "successful_improvements=0" >> $GITHUB_ENV
+          fi
+
+      # 10. 検証モード: プルリクエスト作成
+      - name: Create Pull Request (Verification Mode)
+        if: env.mode == 'verification' && steps.evaluation.outputs.evaluation_completed == 'true' && steps.evaluation.outputs.successful_improvements != '0'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ env.branch_name }}
+          title: "🤖 AI改善提案: ${{ steps.evaluation.outputs.successful_improvements }}件の改善"
+          body: |
+            ## AI改善提案
+            
+            **実行日時**: ${{ github.event_name == 'schedule' && '自動実行' || '手動実行' }}
+            **改善件数**: ${{ steps.evaluation.outputs.successful_improvements }}件
+            
+            ### 改善内容
+            - 詳細は添付の評価レポートを参照してください
+            
+            ### 検証結果
+            - バックテスト結果: [レポート](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/)
+            - 改善履歴: [履歴レポート](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/improvement_history.html)
+            
+            ### 次のステップ
+            1. レビュー後にマージ
+            2. 採用モードで本格導入
+          labels: |
+            ai-improvement
+            verification
+            automated
+
+      # 11. 採用モード: メインブランチへのマージ
+      - name: Merge to main (Adoption Mode)
+        if: env.mode == 'adoption' && steps.evaluation.outputs.evaluation_completed == 'true' && steps.evaluation.outputs.successful_improvements != '0'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          # 改善履歴を更新
+          python -m scripts.update_improvement_history --adopt-successful
+          
+          # コミットとプッシュ
+          git add .
+          git commit -m "🤖 AI改善を採用: ${{ steps.evaluation.outputs.successful_improvements }}件の改善"
+          git push origin main
+
+      # 12. レポート生成
+      - name: Generate reports
+        if: always()
+        run: |
+          python -m scripts.make_index
+          python -m scripts.generate_improvement_reports
+
+      # 13. GitHub Pages へデプロイ
+      - name: Deploy to GitHub Pages
+        if: always()
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: reports
+
+      - name: Deploy to GitHub Pages
+        if: always()
+        uses: actions/deploy-pages@v4
+
+      # 14. Slack通知
+      - name: Notify to Slack
+        if: always()
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          EXECUTION_MODE: ${{ env.mode }}
+          PROPOSAL_COUNT: ${{ steps.proposals.outputs.proposal_count }}
+          SUCCESSFUL_IMPROVEMENTS: ${{ steps.evaluation.outputs.successful_improvements }}
+        run: |
+          python -m scripts.notify_ai_improvement
+
+      # 15. アーティファクト保存
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-improvement-results
+          path: |
+            reports/
+            improvement_proposals.json
+            evaluation_results.json
+            data/improvement_history.json
+
+  # 16. ロールバック処理（必要に応じて）
+  rollback:
+    runs-on: ubuntu-latest
+    needs: ai-improvement
+    if: needs.ai-improvement.result == 'failure' && env.mode == 'adoption'
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Execute rollback
+        run: |
+          python -m scripts.rollback_improvements --auto-rollback
+
+      - name: Create rollback notification
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: rollback-$(date +%Y%m%d-%H%M%S)
+          title: "🚨 自動ロールバック実行"
+          body: |
+            ## 自動ロールバック
+            
+            AI改善ループの実行中にエラーが発生したため、自動的にロールバックを実行しました。
+            
+            **実行日時**: $(date)
+            **エラー内容**: 改善ループ実行失敗
+            
+            ### 対応内容
+            - 前回の安定版パラメータに復元
+            - 改善履歴の更新
+            - システムの安定性確保
+            
+            ### 次のステップ
+            1. エラーの原因調査
+            2. 手動での改善検証
+            3. システム安定性の確認
+          labels: |
+            rollback
+            automated
+            urgent

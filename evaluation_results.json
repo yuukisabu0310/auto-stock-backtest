@@ -1,0 +1,49 @@
+{
+  "mode": "adoption",
+  "branch_name": null,
+  "total_tests": 2,
+  "successful_improvements": 2,
+  "failed_improvements": 0,
+  "success_rate": 1.0,
+  "score_threshold": 0.05,
+  "successful_details": [
+    {
+      "strategy_name": "SmaCross",
+      "description": "SMA期間を短縮してより敏感なシグナルを生成",
+      "improvement_score": 49.8395143631065,
+      "improvement_level": "significant",
+      "recommendation": "強く推奨 - 大幅な改善が期待されます",
+      "risk_assessment": "high",
+      "improved_metrics": [
+        "sharpe_ratio"
+      ],
+      "degraded_metrics": [
+        "return_pct",
+        "max_drawdown",
+        "win_rate"
+      ]
+    },
+    {
+      "strategy_name": "FixedSma",
+      "description": "SMA期間を短縮してトレンド変化への反応を向上",
+      "improvement_score": 48.96935618341259,
+      "improvement_level": "significant",
+      "recommendation": "強く推奨 - 大幅な改善が期待されます",
+      "risk_assessment": "high",
+      "improved_metrics": [
+        "sharpe_ratio"
+      ],
+      "degraded_metrics": [
+        "return_pct",
+        "max_drawdown"
+      ]
+    }
+  ],
+  "failed_details": [],
+  "recommendations": [
+    "2件の改善が成功しました",
+    "- SmaCross: 1件の改善",
+    "- FixedSma: 1件の改善",
+    "大幅な改善が確認されました - 採用を強く推奨します"
+  ]
+}

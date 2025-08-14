@@ -1,0 +1,52 @@
+[
+  {
+    "strategy_name": "SmaCross",
+    "improvement_type": "parameter_optimization",
+    "current_params": {
+      "n_fast": 20,
+      "n_slow": 50
+    },
+    "current_performance": {
+      "sharpe_ratio": 0.8,
+      "return_pct": 12.5,
+      "max_drawdown": -8.2,
+      "win_rate": 0.65
+    },
+    "old_params": {
+      "n_fast": 20,
+      "n_slow": 50
+    },
+    "new_params": {
+      "n_fast": 15,
+      "n_slow": 45
+    },
+    "description": "SMA期間を短縮してより敏感なシグナルを生成",
+    "expected_improvement": "より早いエントリーでリターン向上を期待",
+    "risk_assessment": "低リスク - パラメータ微調整"
+  },
+  {
+    "strategy_name": "FixedSma",
+    "improvement_type": "parameter_optimization",
+    "current_params": {
+      "n_fast": 10,
+      "n_slow": 20
+    },
+    "current_performance": {
+      "sharpe_ratio": 0.6,
+      "return_pct": 8.3,
+      "max_drawdown": -12.1,
+      "win_rate": 0.58
+    },
+    "old_params": {
+      "n_fast": 10,
+      "n_slow": 20
+    },
+    "new_params": {
+      "n_fast": 8,
+      "n_slow": 18
+    },
+    "description": "SMA期間を短縮してトレンド変化への反応を向上",
+    "expected_improvement": "トレンド転換時の早期エントリー",
+    "risk_assessment": "低リスク - パラメータ微調整"
+  }
+]

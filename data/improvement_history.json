@@ -1,0 +1,128 @@
+[
+  {
+    "id": "e070b688",
+    "timestamp": "2025-08-14T15:43:11.715322",
+    "mode": "verification",
+    "strategy_name": "SmaCross",
+    "old_params": {
+      "n_fast": 20,
+      "n_slow": 50
+    },
+    "new_params": {
+      "n_fast": 15,
+      "n_slow": 45
+    },
+    "performance_metrics": {
+      "improved_metrics": [],
+      "degraded_metrics": [
+        "return_pct",
+        "max_drawdown",
+        "win_rate"
+      ],
+      "unchanged_metrics": [
+        "sharpe_ratio"
+      ]
+    },
+    "improvement_score": 47.49318487324968,
+    "description": "SMA期間を短縮してより敏感なシグナルを生成",
+    "branch_name": "main",
+    "commit_hash": "test-commit",
+    "status": "success",
+    "rollback_to": null
+  },
+  {
+    "id": "2fbacd32",
+    "timestamp": "2025-08-14T15:43:11.737391",
+    "mode": "verification",
+    "strategy_name": "FixedSma",
+    "old_params": {
+      "n_fast": 10,
+      "n_slow": 20
+    },
+    "new_params": {
+      "n_fast": 8,
+      "n_slow": 18
+    },
+    "performance_metrics": {
+      "improved_metrics": [
+        "sharpe_ratio"
+      ],
+      "degraded_metrics": [
+        "return_pct",
+        "max_drawdown"
+      ],
+      "unchanged_metrics": [
+        "win_rate"
+      ]
+    },
+    "improvement_score": 47.92359899003708,
+    "description": "SMA期間を短縮してトレンド変化への反応を向上",
+    "branch_name": "main",
+    "commit_hash": "test-commit",
+    "status": "success",
+    "rollback_to": null
+  },
+  {
+    "id": "1c735b7e",
+    "timestamp": "2025-08-14T15:45:18.922647",
+    "mode": "adoption",
+    "strategy_name": "SmaCross",
+    "old_params": {
+      "n_fast": 20,
+      "n_slow": 50
+    },
+    "new_params": {
+      "n_fast": 15,
+      "n_slow": 45
+    },
+    "performance_metrics": {
+      "improved_metrics": [
+        "sharpe_ratio"
+      ],
+      "degraded_metrics": [
+        "return_pct",
+        "max_drawdown",
+        "win_rate"
+      ],
+      "unchanged_metrics": []
+    },
+    "improvement_score": 49.8395143631065,
+    "description": "SMA期間を短縮してより敏感なシグナルを生成",
+    "branch_name": "main",
+    "commit_hash": "test-commit",
+    "status": "success",
+    "rollback_to": null
+  },
+  {
+    "id": "1db7564f",
+    "timestamp": "2025-08-14T15:45:18.947058",
+    "mode": "adoption",
+    "strategy_name": "FixedSma",
+    "old_params": {
+      "n_fast": 10,
+      "n_slow": 20
+    },
+    "new_params": {
+      "n_fast": 8,
+      "n_slow": 18
+    },
+    "performance_metrics": {
+      "improved_metrics": [
+        "sharpe_ratio"
+      ],
+      "degraded_metrics": [
+        "return_pct",
+        "max_drawdown"
+      ],
+      "unchanged_metrics": [
+        "win_rate"
+      ]
+    },
+    "improvement_score": 48.96935618341259,
+    "description": "SMA期間を短縮してトレンド変化への反応を向上",
+    "branch_name": "main",
+    "commit_hash": "test-commit",
+    "status": "success",
+    "rollback_to": null
+  }
+]
