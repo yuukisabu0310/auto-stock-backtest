@@ -94,7 +94,7 @@ jobs:
           python -m scripts.generate_improvements \
             --mode ${{ env.mode }} \
             --strategy "${{ env.strategy }}" \
-            --force ${{ env.force_improvement }}
+            ${{ env.force_improvement == 'true' && '--force' || '' }}
           
           if [ -f "improvement_proposals.json" ]; then
             echo "proposals_generated=true" >> $GITHUB_ENV
