@@ -73,68 +73,327 @@ class ImprovementReportGenerator:
     def _generate_summary_report(self, evaluation: Dict[str, Any], test_results: List[Dict[str, Any]]):
         """サマリーレポートを生成"""
         
+        # 統計データの計算
+        total_proposals = len(test_results)
+        successful_count = len([r for r in test_results if r.get('status') == 'success'])
+        failed_count = total_proposals - successful_count
+        success_rate = (successful_count / total_proposals * 100) if total_proposals > 0 else 0
+        
         html_content = f"""
         <!DOCTYPE html>
-        <html>
+        <html lang="ja">
         <head>
             <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
             <title>AI改善サマリーレポート</title>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <style>
-                body {{ font-family: Arial, sans-serif; margin: 20px; }}
-                .header {{ background: #2c3e50; color: white; padding: 20px; border-radius: 5px; }}
-                .summary {{ background: #ecf0f1; padding: 15px; border-radius: 5px; margin: 10px 0; }}
-                .metric {{ display: inline-block; margin: 10px; padding: 10px; background: white; border-radius: 5px; }}
-                .success {{ color: #27ae60; }}
-                .failure {{ color: #e74c3c; }}
-                .neutral {{ color: #7f8c8d; }}
-                .chart {{ margin: 20px 0; }}
+                * {{
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }}
+                
+                body {{
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    min-height: 100vh;
+                    color: #333;
+                }}
+                
+                .container {{
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }}
+                
+                .header {{
+                    background: rgba(255, 255, 255, 0.95);
+                    backdrop-filter: blur(10px);
+                    border-radius: 20px;
+                    padding: 30px;
+                    margin-bottom: 30px;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+                    text-align: center;
+                }}
+                
+                .header h1 {{
+                    font-size: 2.5em;
+                    color: #2c3e50;
+                    margin-bottom: 10px;
+                    font-weight: 700;
+                }}
+                
+                .header p {{
+                    color: #7f8c8d;
+                    font-size: 1.1em;
+                }}
+                
+                .stats-grid {{
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    gap: 20px;
+                    margin-bottom: 30px;
+                }}
+                
+                .stat-card {{
+                    background: rgba(255, 255, 255, 0.95);
+                    backdrop-filter: blur(10px);
+                    border-radius: 15px;
+                    padding: 25px;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+                    text-align: center;
+                    transition: transform 0.3s ease;
+                }}
+                
+                .stat-card:hover {{
+                    transform: translateY(-5px);
+                }}
+                
+                .stat-value {{
+                    font-size: 2.5em;
+                    font-weight: 700;
+                    margin-bottom: 10px;
+                }}
+                
+                .stat-label {{
+                    color: #7f8c8d;
+                    font-size: 0.9em;
+                }}
+                
+                .positive {{ color: #27ae60; }}
+                .negative {{ color: #e74c3c; }}
+                .neutral {{ color: #3498db; }}
+                
+                .content-section {{
+                    background: rgba(255, 255, 255, 0.95);
+                    backdrop-filter: blur(10px);
+                    border-radius: 20px;
+                    padding: 30px;
+                    margin-bottom: 30px;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+                }}
+                
+                .section-title {{
+                    color: #2c3e50;
+                    font-size: 1.5em;
+                    margin-bottom: 20px;
+                    padding-bottom: 10px;
+                    border-bottom: 2px solid #ecf0f1;
+                }}
+                
+                .improvement-grid {{
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                    gap: 20px;
+                }}
+                
+                .improvement-card {{
+                    background: #f8f9fa;
+                    border-radius: 12px;
+                    padding: 20px;
+                    border-left: 4px solid #3498db;
+                }}
+                
+                .improvement-card.success {{
+                    border-left-color: #27ae60;
+                }}
+                
+                .improvement-card.failed {{
+                    border-left-color: #e74c3c;
+                }}
+                
+                .improvement-card h3 {{
+                    color: #2c3e50;
+                    margin-bottom: 15px;
+                    font-size: 1.2em;
+                }}
+                
+                .metric-row {{
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 8px;
+                    padding: 5px 0;
+                }}
+                
+                .metric-label {{
+                    color: #7f8c8d;
+                    font-size: 0.9em;
+                }}
+                
+                .metric-value {{
+                    font-weight: 600;
+                    font-size: 0.9em;
+                }}
+                
+                .chart-container {{
+                    position: relative;
+                    height: 400px;
+                    margin: 20px 0;
+                }}
+                
+                .footer {{
+                    background: rgba(255, 255, 255, 0.95);
+                    backdrop-filter: blur(10px);
+                    border-radius: 20px;
+                    padding: 20px;
+                    text-align: center;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+                }}
+                
+                .footer a {{
+                    color: #3498db;
+                    text-decoration: none;
+                    margin: 0 10px;
+                }}
+                
+                .footer a:hover {{
+                    text-decoration: underline;
+                }}
+                
+                @media (max-width: 768px) {{
+                    .stats-grid {{
+                        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                    }}
+                    
+                    .improvement-grid {{
+                        grid-template-columns: 1fr;
+                    }}
+                }}
             </style>
         </head>
         <body>
-            <div class="header">
-                <h1>🤖 AI改善サマリーレポート</h1>
-                <p>生成日時: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+            <div class="container">
+                <div class="header">
+                    <h1>🤖 AI改善サマリーレポート</h1>
+                    <p>AI改善ループの実行結果と改善提案の詳細分析</p>
+                    <p>生成日時: {datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')}</p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value neutral">{total_proposals}</div>
+                        <div class="stat-label">総改善提案数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value positive">{successful_count}</div>
+                        <div class="stat-label">成功した改善</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value negative">{failed_count}</div>
+                        <div class="stat-label">失敗した改善</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value neutral">{success_rate:.1f}%</div>
+                        <div class="stat-label">成功率</div>
+                    </div>
+                </div>
+                
+                <div class="content-section">
+                    <h2 class="section-title">📊 改善結果の分布</h2>
+                    <div class="chart-container">
+                        <canvas id="resultsChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="content-section">
+                    <h2 class="section-title">🎯 改善提案の詳細</h2>
+                    <div class="improvement-grid">
+        """
+        
+        # 改善提案の詳細カード
+        for result in test_results:
+            strategy_name = result.get('strategy_name', 'Unknown')
+            status = result.get('status', 'unknown')
+            old_score = result.get('old_score', 0)
+            new_score = result.get('new_score', 0)
+            improvement = result.get('improvement_score', 0)
+            description = result.get('description', '改善提案')
+            
+            card_class = 'success' if status == 'success' else 'failed'
+            score_color = 'positive' if improvement > 0 else 'negative'
+            
+            html_content += f"""
+                        <div class="improvement-card {card_class}">
+                            <h3>{strategy_name}</h3>
+                            <div class="metric-row">
+                                <span class="metric-label">改善提案</span>
+                                <span class="metric-value">{description}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">旧スコア</span>
+                                <span class="metric-value">{old_score:.4f}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">新スコア</span>
+                                <span class="metric-value">{new_score:.4f}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">改善度</span>
+                                <span class="metric-value {score_color}">{improvement:+.4f}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">ステータス</span>
+                                <span class="metric-value">{status}</span>
+                            </div>
+                        </div>
+            """
+        
+        html_content += """
+                    </div>
+                </div>
+                
+                <div class="footer">
+                    <p>
+                        <a href="index.html">← ダッシュボードに戻る</a> |
+                        <a href="comparison_report.html">比較レポート</a> |
+                        <a href="timeline_report.html">タイムライン</a>
+                    </p>
+                </div>
             </div>
             
-            <div class="summary">
-                <h2>実行サマリー</h2>
-                <div class="metric">
-                    <strong>総テスト数:</strong> {evaluation.get('total_tests', 0)}
-                </div>
-                <div class="metric success">
-                    <strong>成功:</strong> {evaluation.get('successful_improvements', 0)}
-                </div>
-                <div class="metric failure">
-                    <strong>失敗:</strong> {evaluation.get('failed_improvements', 0)}
-                </div>
-                <div class="metric">
-                    <strong>成功率:</strong> {evaluation.get('success_rate', 0):.1%}
-                </div>
-            </div>
-            
-            <div class="summary">
-                <h2>戦略別結果</h2>
-                {self._generate_strategy_summary_html(evaluation)}
-            </div>
-            
-            <div class="summary">
-                <h2>推奨事項</h2>
-                {self._generate_recommendations_html(evaluation)}
-            </div>
-            
-            <div class="summary">
-                <h2>改善履歴サマリー</h2>
-                {self._generate_history_summary_html()}
-            </div>
+            <script>
+                // 結果分布チャート
+                const ctx = document.getElementById('resultsChart').getContext('2d');
+                new Chart(ctx, {{
+                    type: 'doughnut',
+                    data: {{
+                        labels: ['成功', '失敗'],
+                        datasets: [{{
+                            data: [{successful_count}, {failed_count}],
+                            backgroundColor: ['#27ae60', '#e74c3c'],
+                            borderWidth: 0
+                        }}]
+                    }},
+                    options: {{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {{
+                            legend: {{
+                                position: 'bottom',
+                                labels: {{
+                                    padding: 20,
+                                    usePointStyle: true
+                                }}
+                            }}
+                        }}
+                    }}
+                }});
+            </script>
         </body>
         </html>
         """
         
+        # データを埋め込み
+        html_content = html_content.replace('{successful_count}', str(successful_count))
+        html_content = html_content.replace('{failed_count}', str(failed_count))
+        
+        # ファイルに保存
         output_file = self.reports_dir / "improvement_summary.html"
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write(html_content)
         
-        logger.info(f"サマリーレポートを生成: {output_file}")
+        logger.info(f"改善サマリーレポートを生成: {output_file}")
     
     def _generate_detailed_report(self, evaluation: Dict[str, Any], test_results: List[Dict[str, Any]]):
         """詳細レポートを生成"""
