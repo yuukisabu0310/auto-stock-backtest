@@ -67,16 +67,38 @@ def run_walk_forward_fixed(
         raise ValueError("strategy_class を指定してください")
 
     df = _prepare_ohlcv(df)
-    print(f"[DEBUG] {ticker}: n_fast={n_fast}, n_slow={n_slow}, rows={len(df)}")
 
-    if df.empty or len(df) < max(n_fast, n_slow) + 10:
+    # データサイズの厳密な検証
+    min_required_length = max(n_fast, n_slow) + 50  # より安全な最小サイズ
+    if df.empty or len(df) < min_required_length:
         # 取引はできないが、空落ちしないよう最低限の行を返す
         meta = {
-            "Ticker": ticker, "Trades": 0, "Return [%]": 0.0,
-            "Sharpe Ratio": float("nan"), "Max. Drawdown [%]": float("nan"),
-            "n_fast": n_fast, "n_slow": n_slow
+            'ticker': ticker,
+            'strategy': strategy_class.__name__,
+            'n_fast': n_fast,
+            'n_slow': n_slow,
+            'train_start': None,
+            'train_end': None,
+            'test_start': None,
+            'test_end': None,
+            'cash': cash,
+            'commission': commission
         }
-        return pd.DataFrame([meta]), pd.DataFrame(columns=["Equity"])
+        
+        # 空の結果を返す
+        empty_stats = pd.Series({
+            'Sharpe Ratio': 0.0,
+            'Return [%]': 0.0,
+            'Max. Drawdown [%]': 0.0,
+            'Trades': 0,
+            'Win Rate [%]': 0.0,
+            'Profit Factor': 0.0,
+            'Sortino Ratio': 0.0,
+            'Calmar Ratio': 0.0,
+            'SQN': 0.0
+        })
+        
+        return pd.DataFrame([empty_stats]), meta
 
     # 窓の作成
     windows = walk_forward_slices(df.index, train_years, test_years, step_years)
@@ -88,11 +110,22 @@ def run_walk_forward_fixed(
     for (tr_s, tr_e, te_s, te_e) in windows:
         train = df.loc[tr_s:tr_e]
         test  = df.loc[te_s:te_e]
-        if len(train) < max(n_fast, n_slow) + 10 or len(test) < 40:  # 最低限
+        
+        # より厳密なデータサイズチェック
+        min_train_length = max(n_fast, n_slow) + 30
+        min_test_length = 50
+        
+        if len(train) < min_train_length or len(test) < min_test_length:
             continue
 
         bt = Backtest(test, strategy_class, cash=cash, commission=commission, exclusive_orders=True, finalize_trades=True)
-        stats = bt.run(**run_kwargs)  # pandas.Series（Sharpe Ratio, Return[%], Trades など）
+        
+        try:
+            stats = bt.run(**run_kwargs)  # pandas.Series（Sharpe Ratio, Return[%], Trades など）
+        except (IndexError, ValueError, TypeError) as e:
+            print(f"[ERROR] {ticker}: バックテスト実行エラー - {e}")
+            # エラーの場合はスキップ
+            continue
 
         # サマリーSeries -> 1行にして蓄積
         row = stats.to_dict()

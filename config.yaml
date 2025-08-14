@@ -1,10 +1,10 @@
 # Auto Stock Backtest Configuration
 backtest:
-  # 基本設定
-  start_date: "2005-01-01"
-  end_date: null  # nullの場合は現在日付
-  cash: 100000
-  commission: 0.002
+  # バックテスト基本設定
+  start_date: "${BACKTEST_START_DATE:-2005-01-01}"  # 環境変数で切り替え可能
+  end_date: "${BACKTEST_END_DATE:-null}"            # 環境変数で切り替え可能
+  cash: "${BACKTEST_CASH:-100000}"                  # 環境変数で切り替え可能
+  commission: "${BACKTEST_COMMISSION:-0.002}"       # 環境変数で切り替え可能
   slippage: 0.001  # スリッページ（0.1%）
   
   # データ取得設定
@@ -21,10 +21,10 @@ backtest:
     step_years: 1
     min_data_points: 20
     
-  # サンプリング設定
+  # サンプリング設定（環境変数で切り替え可能）
   sampling:
-    sample_size: 12
-    oos_random_size: 8
+    sample_size: "${SAMPLE_SIZE:-12}"           # 動作確認: 4, 本番: 12
+    oos_random_size: "${OOS_RANDOM_SIZE:-8}"    # 動作確認: 3, 本番: 8
     holdout_months: 12
     stratification: true
     
@@ -37,6 +37,8 @@ backtest:
   
   # AI改善設定
   ai_improvement:
+    enabled: "${AI_IMPROVEMENT_ENABLED:-true}"  # 環境変数で切り替え可能
+    force_improvement: false
     similarity_threshold: 0.9  # 類似提案の閾値
     max_improvements_per_run: 3  # 1回の実行での最大改善提案数
     improvement_score_threshold: 0.05  # 改善スコアの閾値
@@ -44,29 +46,149 @@ backtest:
 
 # 戦略設定
 strategies:
+  # 固定SMA戦略
   FixedSma:
     enabled: true
-    params:
-      sma_period: [8, 18, 30, 50]  # 改善: 10→8, 20→18
+    parameters:
+      sma_period: "${FIXEDSMA_PERIODS:-[8, 18, 30, 50]}"  # 環境変数で切り替え可能
     risk_management:
-      enabled: false
-      
+      stop_loss_pct: 0.05
+      take_profit_pct: 0.10
+      max_position_size: 0.1
+      max_drawdown_limit: 0.25
+
+  # SMAクロス戦略
   SmaCross:
     enabled: true
-    params:
-      n_fast: [15, 30, 40]  # 改善: 20→15
-      n_slow: [45, 60, 80, 100]  # 改善: 50→45
+    parameters:
+      n_fast: "${SMACROSS_FAST:-[15, 30, 40]}"      # 環境変数で切り替え可能
+      n_slow: "${SMACROSS_SLOW:-[45, 60, 80, 100]}"  # 環境変数で切り替え可能
     risk_management:
-      enabled: true
-      
-  Momentum:
-    enabled: false  # 今後追加予定
-    params:
+      stop_loss_pct: 0.05
+      take_profit_pct: 0.10
+      max_position_size: 0.1
+      max_drawdown_limit: 0.25
+
+  # 移動平均ブレイク戦略
+  MovingAverageBreakout:
+    enabled: "${MA_BREAKOUT_ENABLED:-true}"  # 環境変数で切り替え可能
+    parameters:
+      sma_short: [20, 30]
+      sma_medium: [50, 60]
+      sma_long: [200]
+      atr_period: [14, 20]
+      volume_multiplier: [1.5, 2.0]
+    risk_management:
+      stop_loss_pct: 0.05
+      take_profit_pct: 0.10
+      max_position_size: 0.1
+      max_drawdown_limit: 0.25
+
+  # ドンチャンチャネル戦略
+  DonchianChannel:
+    enabled: "${DONCHIAN_ENABLED:-true}"  # 環境変数で切り替え可能
+    parameters:
+      channel_period: [55, 100]
+      stop_period: [20, 30]
+      atr_multiplier: [1.5, 2.0, 2.5]
+    risk_management:
+      stop_loss_pct: 0.05
+      take_profit_pct: 0.10
+      max_position_size: 0.1
+      max_drawdown_limit: 0.25
+
+  # MACD戦略
+  MACD:
+    enabled: true
+    parameters:
+      macd_fast: [12, 15]
+      macd_slow: [26, 30]
+      macd_signal: [9, 12]
+      volume_multiplier: [1.0, 1.5]
+    risk_management:
+      stop_loss_pct: 0.05
+      take_profit_pct: 0.10
+      max_position_size: 0.1
+      max_drawdown_limit: 0.25
+
+  # RSIモメンタム戦略
+  RSIMomentum:
+    enabled: "${RSI_MOMENTUM_ENABLED:-true}"  # 環境変数で切り替え可能
+    parameters:
       rsi_period: [14, 21]
-      rsi_oversold: [20, 30]
-      rsi_overbought: [70, 80]
+      rsi_entry: [50, 55, 60]
+      rsi_exit_high: [65, 70, 75]
+      rsi_exit_low: [40, 45, 50]
     risk_management:
-      enabled: true
+      stop_loss_pct: 0.05
+      take_profit_pct: 0.10
+      max_position_size: 0.1
+      max_drawdown_limit: 0.25
+
+  # RSI極端値戦略
+  RSIExtreme:
+    enabled: "${RSI_EXTREME_ENABLED:-true}"  # 環境変数で切り替え可能
+    parameters:
+      rsi_period: [2, 3]
+      rsi_oversold: [5, 10, 15]
+      rsi_overbought: [70, 75, 80]
+      sma_period: [200]
+      time_stop_days: [3, 5, 7]
+    risk_management:
+      stop_loss_pct: 0.05
+      take_profit_pct: 0.10
+      max_position_size: 0.1
+      max_drawdown_limit: 0.25
+
+  # ボリンジャーバンド戦略
+  BollingerBands:
+    enabled: "${BB_ENABLED:-true}"  # 環境変数で切り替え可能
+    parameters:
+      bb_period: [20, 30]
+      bb_std: [1.5, 2.0, 2.5]
+    risk_management:
+      stop_loss_pct: 0.05
+      take_profit_pct: 0.10
+      max_position_size: 0.1
+      max_drawdown_limit: 0.25
+
+  # スクイーズ戦略
+  Squeeze:
+    enabled: "${SQUEEZE_ENABLED:-true}"  # 環境変数で切り替え可能
+    parameters:
+      bb_period: [20, 30]
+      bb_std: [2.0, 2.5]
+      keltner_period: [20, 30]
+      keltner_multiplier: [1.5, 2.0, 2.5]
+      volume_multiplier: [1.5, 2.0]
+    risk_management:
+      stop_loss_pct: 0.05
+      take_profit_pct: 0.10
+      max_position_size: 0.1
+      max_drawdown_limit: 0.25
+
+  # 出来高ブレイク戦略
+  VolumeBreakout:
+    enabled: "${VOLUME_BREAKOUT_ENABLED:-true}"  # 環境変数で切り替え可能
+    parameters:
+      breakout_period: [20, 30, 50]
+      volume_multiplier: [1.5, 2.0, 2.5]
+    risk_management:
+      stop_loss_pct: 0.05
+      take_profit_pct: 0.10
+      max_position_size: 0.1
+      max_drawdown_limit: 0.25
+
+  # OBV戦略
+  OBV:
+    enabled: "${OBV_ENABLED:-true}"  # 環境変数で切り替え可能
+    parameters:
+      obv_period: [20, 30, 50]
+    risk_management:
+      stop_loss_pct: 0.05
+      take_profit_pct: 0.10
+      max_position_size: 0.1
+      max_drawdown_limit: 0.25
 
 # 銘柄リスト設定
 universe:

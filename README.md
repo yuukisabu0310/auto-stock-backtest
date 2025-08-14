@@ -48,6 +48,60 @@ GitHub Actionsを利用して、定期的に日本株・米国株を対象とし
 - **Slack連携**: 実行結果やパラメータをSlackチャンネルに通知
 - **GitHub Actions自動化**: 定期的にバックテストを実行し、レポートを出力
 
+## 🚀 実行方法
+
+### 動作確認（軽量設定）
+
+動作確認時は軽量設定で素早くテストできます：
+
+```powershell
+# 動作確認モード設定
+.\scripts\setup_test_mode.ps1
+
+# バックテスト実行
+python -m scripts.run_backtest_enhanced
+```
+
+**動作確認設定内容:**
+- 期間: 2020-01-01 ～ 2023-12-31 (4年)
+- 資金: $10,000
+- 学習銘柄: 4銘柄
+- 検証銘柄: 3銘柄
+- 実行戦略: 全11戦略
+- AI改善: 無効
+
+### 本番実行（完全設定）
+
+本番実行時は完全設定で詳細な分析を行います：
+
+```powershell
+# 本番モード設定
+.\scripts\setup_production_mode.ps1
+
+# バックテスト実行
+python -m scripts.run_backtest_enhanced
+```
+
+**本番設定内容:**
+- 期間: 2005-01-01 ～ 現在 (18年)
+- 資金: $100,000
+- 学習銘柄: 12銘柄
+- 検証銘柄: 8銘柄
+- 実行戦略: 全11戦略
+- AI改善: 有効
+
+### 従来の実行方法
+
+従来の実行方法も引き続き利用可能です：
+
+```bash
+# 従来のバックテスト実行
+python -m scripts.run_backtest
+
+# 改善されたバックテスト実行
+python -m scripts.run_backtest_enhanced
+```
+
 ## ディレクトリ構成
 
 ```

@@ -35,7 +35,28 @@ class ConfigManager:
         """文字列内の環境変数を展開"""
         def replace_var(match):
             var_name = match.group(1)
-            return os.getenv(var_name, match.group(0))
+            default_value = match.group(0)
+            env_value = os.getenv(var_name)
+            
+            if env_value is None:
+                # デフォルト値がある場合（${VAR:-default}形式）
+                if ':-' in var_name:
+                    var_name, default = var_name.split(':-', 1)
+                    env_value = os.getenv(var_name, default)
+                else:
+                    return default_value
+            
+            # 数値型の環境変数を適切に変換
+            if env_value.lower() in ['true', 'false']:
+                return env_value.lower()
+            elif env_value.lower() == 'null':
+                return 'null'
+            elif env_value.startswith('[') and env_value.endswith(']'):
+                # リスト形式の場合はそのまま返す（YAMLが自動解析）
+                return env_value
+            else:
+                # 数値の場合はそのまま返す（YAMLが自動変換）
+                return env_value
             
         import re
         return re.sub(r'\$\{([^}]+)\}', replace_var, content)
@@ -92,7 +113,7 @@ class ConfigManager:
         strategies = self.get_strategies_config()
         if strategy_name not in strategies:
             raise ValueError(f"戦略 '{strategy_name}' が見つかりません")
-        return strategies[strategy_name].get('params', {})
+        return strategies[strategy_name].get('parameters', {})
         
     def get_risk_management_config(self, strategy_name: str) -> Dict[str, Any]:
         """指定戦略のリスク管理設定を取得"""

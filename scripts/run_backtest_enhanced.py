@@ -94,9 +94,9 @@ class EnhancedBacktestRunner:
         # 銘柄リストの分割
         non_ai, ai = split_universe(extra_list)
         
-        # サンプリング設定
-        sample_size = self.backtest_config.get('sampling', {}).get('sample_size', 12)
-        oos_random_size = self.backtest_config.get('sampling', {}).get('oos_random_size', 8)
+        # サンプリング設定（環境変数から直接取得して数値に変換）
+        sample_size = int(os.getenv('SAMPLE_SIZE', '12'))
+        oos_random_size = int(os.getenv('OOS_RANDOM_SIZE', '8'))
         
         # シード設定
         seed = os.getenv("RANDOM_SEED", "")
@@ -127,9 +127,11 @@ class EnhancedBacktestRunner:
         """データの一括取得"""
         logger.info(f"データ取得開始: {len(tickers)}銘柄")
         
-        # データ取得設定
-        start_date = self.backtest_config.get('start_date', '2005-01-01')
-        end_date = self.backtest_config.get('end_date')
+        # データ取得設定（環境変数から直接取得）
+        start_date = os.getenv('BACKTEST_START_DATE', '2005-01-01')
+        end_date = os.getenv('BACKTEST_END_DATE')
+        if end_date == 'null' or end_date == 'None':
+            end_date = None
         
         # 並列処理でデータ取得
         with Pool(min(max(1, cpu_count() - 1), 6)) as pool:
@@ -148,6 +150,9 @@ class EnhancedBacktestRunner:
     def _load_single_ticker(self, ticker: str, start_date: str, end_date: str) -> pd.DataFrame:
         """単一銘柄のデータ取得"""
         try:
+            # end_dateの処理（'null'文字列をNoneに変換）
+            if end_date == 'null' or end_date == 'None':
+                end_date = None
             return data_manager.get_ohlcv_data(ticker, start_date, end_date)
         except Exception as e:
             logger.error(f"データ取得エラー {ticker}: {e}")
@@ -164,16 +169,14 @@ class EnhancedBacktestRunner:
             param_combinations = self._generate_param_combinations(strategy_params)
             
             # 学習データでのパラメータ最適化
-            best_params, best_score = self._optimize_parameters(
+            best_params = self._optimize_parameters(
                 strategy_name, learn_list, price_cache, param_combinations
             )
             
-            if best_params is None:
+            if not best_params:
                 logger.error(f"パラメータ最適化失敗: {strategy_name}")
                 return
                 
-            logger.info(f"最適パラメータ: {strategy_name} - {best_params} (スコア: {best_score:.4f})")
-            
             # 検証データでの評価
             self._evaluate_strategy(strategy_name, oos_list, price_cache, best_params)
             
@@ -183,10 +186,28 @@ class EnhancedBacktestRunner:
     def _generate_param_combinations(self, params: Dict[str, List]) -> List[Dict[str, Any]]:
         """パラメータの組み合わせを生成"""
         import itertools
+        import ast
         
-        # パラメータ名と値のリストを取得
+        # パラメータ名と値のリストを取得（文字列の場合は解析）
         param_names = list(params.keys())
-        param_values = list(params.values())
+        param_values = []
+        
+        for value in params.values():
+            if isinstance(value, str):
+                try:
+                    # 文字列のリストを解析
+                    parsed_value = ast.literal_eval(value)
+                    if isinstance(parsed_value, list):
+                        param_values.append(parsed_value)
+                    else:
+                        param_values.append([parsed_value])
+                except (ValueError, SyntaxError):
+                    # 解析できない場合は単一値として扱う
+                    param_values.append([value])
+            elif isinstance(value, list):
+                param_values.append(value)
+            else:
+                param_values.append([value])
         
         # 全組み合わせを生成
         combinations = []
@@ -198,33 +219,31 @@ class EnhancedBacktestRunner:
         
     def _optimize_parameters(self, strategy_name: str, learn_list: List[str], 
                            price_cache: Dict[str, pd.DataFrame], 
-                           param_combinations: List[Dict[str, Any]]) -> Tuple[Dict[str, Any], float]:
-        """パラメータの最適化"""
+                           param_combinations: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """パラメータ最適化"""
         logger.info(f"パラメータ最適化開始: {strategy_name} - {len(param_combinations)}組み合わせ")
         
-        best_params = None
         best_score = -1e9
+        best_params = {}
         
-        # 並列処理でパラメータ評価
-        with Pool(min(max(1, cpu_count() - 1), 6)) as pool:
-            args = [(strategy_name, learn_list, price_cache, params) 
-                   for params in param_combinations]
-            results = pool.starmap(self._evaluate_parameters, args)
-            
-        # 最良のパラメータを選択
-        for params, score in zip(param_combinations, results):
+        for params in param_combinations:
+            score = self._evaluate_parameters(strategy_name, learn_list, price_cache, params)
             if score > best_score:
                 best_score = score
-                best_params = params
-                
-        return best_params, best_score
+                best_params = params.copy()
+        
+        if best_params:
+            logger.info(f"最適パラメータ: {best_params} (スコア: {best_score:.4f})")
+        else:
+            logger.warning(f"パラメータ最適化失敗: {strategy_name}")
+            
+        return best_params
         
     def _evaluate_parameters(self, strategy_name: str, learn_list: List[str], 
                            price_cache: Dict[str, pd.DataFrame], 
                            params: Dict[str, Any]) -> float:
         """パラメータの評価"""
         try:
-            # 戦略クラスの取得
             strategy_class = StrategyFactory.get_strategy(strategy_name)
             
             # 各銘柄での評価
@@ -239,8 +258,12 @@ class EnhancedBacktestRunner:
                     
                 # Walk-Forward検証（戦略に応じてパラメータを変換）
                 wf_params = self._convert_params_for_walkforward(strategy_name, params)
+                # バックテスト設定を環境変数から取得
+                cash = float(os.getenv('BACKTEST_CASH', '100000'))
+                commission = float(os.getenv('BACKTEST_COMMISSION', '0.002'))
                 res_df, _ = run_walk_forward_fixed(
-                    data, strategy_class=strategy_class, ticker=ticker, **wf_params
+                    data, strategy_class=strategy_class, ticker=ticker, 
+                    cash=cash, commission=commission, **wf_params
                 )
                 
                 if not res_df.empty:
@@ -260,8 +283,6 @@ class EnhancedBacktestRunner:
                           price_cache: Dict[str, pd.DataFrame], 
                           best_params: Dict[str, Any]):
         """戦略の最終評価"""
-        logger.info(f"戦略評価開始: {strategy_name}")
-        
         # 出力ディレクトリの作成
         output_dir = Path("reports") / strategy_name
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -282,8 +303,12 @@ class EnhancedBacktestRunner:
             try:
                 # Walk-Forward検証（戦略に応じてパラメータを変換）
                 wf_params = self._convert_params_for_walkforward(strategy_name, best_params)
+                # バックテスト設定を環境変数から取得
+                cash = float(os.getenv('BACKTEST_CASH', '100000'))
+                commission = float(os.getenv('BACKTEST_COMMISSION', '0.002'))
                 res_df, equity = run_walk_forward_fixed(
-                    data, strategy_class=strategy_class, ticker=ticker, **wf_params
+                    data, strategy_class=strategy_class, ticker=ticker, 
+                    cash=cash, commission=commission, **wf_params
                 )
                 
                 if not res_df.empty:
@@ -327,14 +352,78 @@ class EnhancedBacktestRunner:
         return metrics
         
     def _convert_params_for_walkforward(self, strategy_name: str, params: Dict[str, Any]) -> Dict[str, Any]:
-        """戦略に応じてパラメータをWalk-Forward用に変換"""
+        """戦略に応じてパラメータをWalk-Forward用に変換（数値に変換）"""
+        def safe_int(value):
+            """安全に整数に変換"""
+            try:
+                return int(float(value))
+            except (ValueError, TypeError):
+                return 20  # デフォルト値
+        
         if strategy_name == 'FixedSma':
-            # FixedSma戦略: sma_period -> n_fast, n_slow
-            sma_period = params.get('sma_period', 20)
+            # FixedSma戦略: sma_period -> n_fast, n_slow（同じ値を使用）
+            sma_period = safe_int(params.get('sma_period', 20))
             return {'n_fast': sma_period, 'n_slow': sma_period}
         elif strategy_name == 'SmaCross':
             # SmaCross戦略: n_fast, n_slowをそのまま使用
-            return {k: v for k, v in params.items() if k in ['n_fast', 'n_slow']}
+            return {
+                'n_fast': safe_int(params.get('n_fast', 20)),
+                'n_slow': safe_int(params.get('n_slow', 50))
+            }
+        elif strategy_name == 'MovingAverageBreakout':
+            # 移動平均ブレイク戦略: デフォルトパラメータ
+            return {
+                'n_fast': safe_int(params.get('sma_short', 20)),
+                'n_slow': safe_int(params.get('sma_medium', 50))
+            }
+        elif strategy_name == 'DonchianChannel':
+            # ドンチャンチャネル戦略: デフォルトパラメータ
+            return {
+                'n_fast': safe_int(params.get('channel_period', 55)),
+                'n_slow': safe_int(params.get('stop_period', 20))
+            }
+        elif strategy_name == 'MACD':
+            # MACD戦略: デフォルトパラメータ
+            return {
+                'n_fast': safe_int(params.get('macd_fast', 12)),
+                'n_slow': safe_int(params.get('macd_slow', 26))
+            }
+        elif strategy_name == 'RSIMomentum':
+            # RSIモメンタム戦略: デフォルトパラメータ
+            return {
+                'n_fast': safe_int(params.get('rsi_period', 14)),
+                'n_slow': safe_int(params.get('rsi_entry', 55))
+            }
+        elif strategy_name == 'RSIExtreme':
+            # RSI極端値戦略: デフォルトパラメータ
+            return {
+                'n_fast': safe_int(params.get('rsi_period', 2)),
+                'n_slow': safe_int(params.get('sma_period', 200))
+            }
+        elif strategy_name == 'BollingerBands':
+            # ボリンジャーバンド戦略: デフォルトパラメータ
+            return {
+                'n_fast': safe_int(params.get('bb_period', 20)),
+                'n_slow': safe_int(float(params.get('bb_std', 2.0)) * 10)  # 2.0 -> 20
+            }
+        elif strategy_name == 'Squeeze':
+            # スクイーズ戦略: デフォルトパラメータ
+            return {
+                'n_fast': safe_int(params.get('bb_period', 20)),
+                'n_slow': safe_int(params.get('keltner_period', 20))
+            }
+        elif strategy_name == 'VolumeBreakout':
+            # 出来高ブレイク戦略: デフォルトパラメータ
+            return {
+                'n_fast': safe_int(params.get('breakout_period', 20)),
+                'n_slow': safe_int(float(params.get('volume_multiplier', 2.0)) * 10)  # 2.0 -> 20
+            }
+        elif strategy_name == 'OBV':
+            # OBV戦略: デフォルトパラメータ
+            return {
+                'n_fast': safe_int(params.get('obv_period', 20)),
+                'n_slow': 50  # 固定値
+            }
         else:
             # その他の戦略: デフォルト値
             return {'n_fast': 10, 'n_slow': 20}

@@ -35,6 +35,10 @@ class DataManager:
             start_date = self.backtest_config.get('start_date', '2005-01-01')
         if end_date is None:
             end_date = self.backtest_config.get('end_date')
+        
+        # end_dateの処理（'null'文字列をNoneに変換）
+        if end_date == 'null' or end_date == 'None':
+            end_date = None
             
         # キャッシュチェック
         cached_data = self._load_from_cache(ticker, start_date, end_date)
@@ -59,6 +63,10 @@ class DataManager:
         max_attempts = self.data_config.get('retry_attempts', 3)
         retry_delay = self.data_config.get('retry_delay', 60)
         rate_limit_delay = self.data_config.get('rate_limit_delay', 1)
+        
+        # end_dateの処理（'null'文字列をNoneに変換）
+        if end_date == 'null' or end_date == 'None':
+            end_date = None
         
         for attempt in range(max_attempts):
             try:
@@ -220,6 +228,9 @@ class DataManager:
         
     def _get_cache_key(self, ticker: str, start_date: str, end_date: str) -> str:
         """キャッシュキーの生成"""
+        # end_dateの処理（'null'文字列をNoneに変換）
+        if end_date == 'null' or end_date == 'None':
+            end_date = 'None'
         return f"{ticker}_{start_date}_{end_date}.pkl"
         
     def _get_cache_path(self, ticker: str, start_date: str, end_date: str) -> Path:
