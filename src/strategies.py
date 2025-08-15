@@ -65,23 +65,31 @@ class SmaCross(Strategy):
 
     def next(self):
         atr_val = self._atr[-1]
-        if not np.isfinite(atr_val) or atr_val <= 0:
-            size = 0
-        else:
-            daily_vol = atr_val / self.data.Close[-1]
-            if daily_vol and daily_vol > 0:
-                target_pos_vol = self.target_vol_yr / (daily_vol * (252 ** 0.5))
-                max_size = self.equity * self.risk_cap / self.data.Close[-1]
-                size = max(0, min(max_size, self.equity * target_pos_vol / self.data.Close[-1]))
+        
+        # 安全なsize計算
+        try:
+            if not np.isfinite(atr_val) or atr_val <= 0:
+                size = 0.1  # デフォルトサイズ
             else:
-                size = 0
-
-        px = self.data.Close[-1] * (
-            1 + self.slip_k_atr * (atr_val / self.data.Close[-1] if self.data.Close[-1] else 0)
-        )
+                daily_vol = atr_val / self.data.Close[-1]
+                if daily_vol and daily_vol > 0 and np.isfinite(daily_vol):
+                    target_pos_vol = self.target_vol_yr / (daily_vol * (252 ** 0.5))
+                    max_size = self.equity * self.risk_cap / self.data.Close[-1]
+                    calculated_size = self.equity * target_pos_vol / self.data.Close[-1]
+                    
+                    # 有効な範囲に制限
+                    size = max(0.01, min(0.95, calculated_size / self.equity))
+                    
+                    # NaNや無限大をチェック
+                    if not np.isfinite(size):
+                        size = 0.1
+                else:
+                    size = 0.1  # デフォルトサイズ
+        except:
+            size = 0.1  # エラー時のデフォルトサイズ
 
         if crossover(self.sma_fast, self.sma_slow):
-            if not self.position.is_long and size > 0:
+            if not self.position.is_long:
                 self.position.close()
                 self.buy(size=size)
         elif crossover(self.sma_slow, self.sma_fast):

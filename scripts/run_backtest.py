@@ -250,8 +250,11 @@ def main():
         dfs_to_concat = []
         for df, name in [(df_oos_nonai, "df_oos_nonai"), (df_oos_fixed, "df_oos_fixed"), 
                          (df_ho_nonai, "df_ho_nonai"), (df_ho_fixed, "df_ho_fixed")]:
-            if df is not None and not df.empty:
-                dfs_to_concat.append(df)
+            if df is not None and not df.empty and len(df) > 0:
+                # 空の列を除外
+                df_clean = df.dropna(how='all')
+                if not df_clean.empty:
+                    dfs_to_concat.append(df_clean)
         
         if dfs_to_concat:
             out = pd.concat(dfs_to_concat, ignore_index=True)
