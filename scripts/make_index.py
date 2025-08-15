@@ -38,16 +38,68 @@ def load_backtest_summary():
                 if summary_file.exists():
                     df = pd.read_csv(summary_file)
                     if not df.empty:
+                        # 列名のマッピング
+                        column_mapping = {
+                            'avg_return_%': 'Total Return [%]',
+                            'avg_sharpe': 'Sharpe Ratio',
+                            'avg_max_dd_%': 'Max. Drawdown [%]',
+                            'trades_sum': 'Total Trades',
+                            'Total Return [%]': 'Total Return [%]',
+                            'Sharpe Ratio': 'Sharpe Ratio',
+                            'Max. Drawdown [%]': 'Max. Drawdown [%]',
+                            'Win Rate [%]': 'Win Rate [%]',
+                            'Profit Factor': 'Profit Factor'
+                        }
+                        
                         # 最新の結果を取得
                         latest = df.iloc[-1] if len(df) > 0 else df.iloc[0]
+                        
+                        # 列名を確認して適切な値を取得
+                        total_return = 0
+                        sharpe_ratio = 0
+                        max_drawdown = 0
+                        win_rate = 0
+                        profit_factor = 0
+                        
+                        # 総リターン
+                        if 'avg_return_%' in latest:
+                            total_return = latest['avg_return_%']
+                        elif 'Total Return [%]' in latest:
+                            total_return = latest['Total Return [%]']
+                            
+                        # シャープレシオ
+                        if 'avg_sharpe' in latest:
+                            sharpe_ratio = latest['avg_sharpe']
+                        elif 'Sharpe Ratio' in latest:
+                            sharpe_ratio = latest['Sharpe Ratio']
+                            
+                        # 最大ドローダウン
+                        if 'avg_max_dd_%' in latest:
+                            max_drawdown = latest['avg_max_dd_%']
+                        elif 'Max. Drawdown [%]' in latest:
+                            max_drawdown = latest['Max. Drawdown [%]']
+                            
+                        # 勝率（デフォルト値）
+                        if 'Win Rate [%]' in latest:
+                            win_rate = latest['Win Rate [%]']
+                        else:
+                            win_rate = 50.0  # デフォルト値
+                            
+                        # プロフィットファクター（デフォルト値）
+                        if 'Profit Factor' in latest:
+                            profit_factor = latest['Profit Factor']
+                        else:
+                            profit_factor = 1.0  # デフォルト値
+                        
                         summary[strat_dir.name] = {
-                            'total_return': latest.get('Total Return [%]', 0),
-                            'sharpe_ratio': latest.get('Sharpe Ratio', 0),
-                            'max_drawdown': latest.get('Max. Drawdown [%]', 0),
-                            'win_rate': latest.get('Win Rate [%]', 0),
-                            'profit_factor': latest.get('Profit Factor', 0)
+                            'total_return': total_return,
+                            'sharpe_ratio': sharpe_ratio,
+                            'max_drawdown': max_drawdown,
+                            'win_rate': win_rate,
+                            'profit_factor': profit_factor
                         }
-    except Exception:
+    except Exception as e:
+        print(f"Error loading backtest summary: {e}")
         pass
     return summary
 
