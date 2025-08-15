@@ -15,7 +15,15 @@ def load_improvement_history():
         history_file = Path("data/improvement_history.json")
         if history_file.exists():
             with open(history_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
+                data = json.load(f)
+                # データがリストの場合は辞書形式に変換
+                if isinstance(data, list):
+                    return {"improvements": data, "summary": {}}
+                # データが辞書の場合はそのまま返す
+                elif isinstance(data, dict):
+                    return data
+                else:
+                    return {"improvements": [], "summary": {}}
     except Exception:
         pass
     return {"improvements": [], "summary": {}}

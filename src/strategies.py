@@ -66,27 +66,46 @@ class SmaCross(Strategy):
     def next(self):
         atr_val = self._atr[-1]
         
-        # 安全なsize計算
+        # 安全なsize計算 - より厳密なバリデーション
         try:
+            # 基本チェック
             if not np.isfinite(atr_val) or atr_val <= 0:
-                size = 0.1  # デフォルトサイズ
+                size = 0.1
+            elif not np.isfinite(self.data.Close[-1]) or self.data.Close[-1] <= 0:
+                size = 0.1
+            elif not np.isfinite(self.equity) or self.equity <= 0:
+                size = 0.1
             else:
                 daily_vol = atr_val / self.data.Close[-1]
-                if daily_vol and daily_vol > 0 and np.isfinite(daily_vol):
-                    target_pos_vol = self.target_vol_yr / (daily_vol * (252 ** 0.5))
-                    max_size = self.equity * self.risk_cap / self.data.Close[-1]
-                    calculated_size = self.equity * target_pos_vol / self.data.Close[-1]
-                    
-                    # 有効な範囲に制限
-                    size = max(0.01, min(0.95, calculated_size / self.equity))
-                    
-                    # NaNや無限大をチェック
-                    if not np.isfinite(size):
-                        size = 0.1
+                
+                # daily_volの妥当性チェック
+                if not np.isfinite(daily_vol) or daily_vol <= 0 or daily_vol > 1:
+                    size = 0.1
                 else:
-                    size = 0.1  # デフォルトサイズ
+                    try:
+                        target_pos_vol = self.target_vol_yr / (daily_vol * (252 ** 0.5))
+                        
+                        # target_pos_volの妥当性チェック
+                        if not np.isfinite(target_pos_vol) or target_pos_vol <= 0:
+                            size = 0.1
+                        else:
+                            # 最終的なsize計算
+                            calculated_size = self.equity * target_pos_vol / self.data.Close[-1]
+                            
+                            # 有効な範囲に制限（0.01〜0.95）
+                            size = max(0.01, min(0.95, calculated_size / self.equity))
+                            
+                            # 最終的な妥当性チェック
+                            if not np.isfinite(size) or size <= 0 or size >= 1:
+                                size = 0.1
+                    except:
+                        size = 0.1
         except:
-            size = 0.1  # エラー時のデフォルトサイズ
+            size = 0.1
+
+        # 最終的なsizeの妥当性チェック
+        if not np.isfinite(size) or size <= 0 or size >= 1:
+            size = 0.1
 
         if crossover(self.sma_fast, self.sma_slow):
             if not self.position.is_long:
