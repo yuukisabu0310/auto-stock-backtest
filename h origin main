@@ -1,0 +1,3 @@
+[33mf20b51e[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m make_index.py: CSV列名の互換性を修正して戦略パフォーマンス表示を改善
+[33m5b4edbf[m SmaCross戦略のsize計算強化とmake_index.pyのhistory処理修正、セキュリティ対応
+[33mb6c8a82[m SmaCross戦略のsize計算エラー修正とFutureWarning対応

@@ -51,43 +51,40 @@ def load_backtest_summary():
                             'Profit Factor': 'Profit Factor'
                         }
                         
-                        # 最新の結果を取得
-                        latest = df.iloc[-1] if len(df) > 0 else df.iloc[0]
-                        
-                        # 列名を確認して適切な値を取得
+                        # 全銘柄の平均値を計算
                         total_return = 0
                         sharpe_ratio = 0
                         max_drawdown = 0
                         win_rate = 0
                         profit_factor = 0
-                        
-                        # 総リターン
-                        if 'avg_return_%' in latest:
-                            total_return = latest['avg_return_%']
-                        elif 'Total Return [%]' in latest:
-                            total_return = latest['Total Return [%]']
+                         
+                        # 総リターン（平均値）
+                        if 'avg_return_%' in df.columns:
+                            total_return = df['avg_return_%'].mean()
+                        elif 'Total Return [%]' in df.columns:
+                            total_return = df['Total Return [%]'].mean()
                             
-                        # シャープレシオ
-                        if 'avg_sharpe' in latest:
-                            sharpe_ratio = latest['avg_sharpe']
-                        elif 'Sharpe Ratio' in latest:
-                            sharpe_ratio = latest['Sharpe Ratio']
+                        # シャープレシオ（平均値）
+                        if 'avg_sharpe' in df.columns:
+                            sharpe_ratio = df['avg_sharpe'].mean()
+                        elif 'Sharpe Ratio' in df.columns:
+                            sharpe_ratio = df['Sharpe Ratio'].mean()
                             
-                        # 最大ドローダウン
-                        if 'avg_max_dd_%' in latest:
-                            max_drawdown = latest['avg_max_dd_%']
-                        elif 'Max. Drawdown [%]' in latest:
-                            max_drawdown = latest['Max. Drawdown [%]']
+                        # 最大ドローダウン（平均値）
+                        if 'avg_max_dd_%' in df.columns:
+                            max_drawdown = df['avg_max_dd_%'].mean()
+                        elif 'Max. Drawdown [%]' in df.columns:
+                            max_drawdown = df['Max. Drawdown [%]'].mean()
                             
                         # 勝率（デフォルト値）
-                        if 'Win Rate [%]' in latest:
-                            win_rate = latest['Win Rate [%]']
+                        if 'Win Rate [%]' in df.columns:
+                            win_rate = df['Win Rate [%]'].mean()
                         else:
                             win_rate = 50.0  # デフォルト値
                             
                         # プロフィットファクター（デフォルト値）
-                        if 'Profit Factor' in latest:
-                            profit_factor = latest['Profit Factor']
+                        if 'Profit Factor' in df.columns:
+                            profit_factor = df['Profit Factor'].mean()
                         else:
                             profit_factor = 1.0  # デフォルト値
                         
