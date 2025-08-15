@@ -7,6 +7,7 @@ import os
 import sys
 import random
 import time
+import argparse
 from pathlib import Path
 from typing import Dict, List, Any, Tuple
 import pandas as pd
@@ -79,6 +80,35 @@ class EnhancedBacktestRunner:
             
         except Exception as e:
             logger.error(f"バックテスト実行エラー: {e}")
+            raise
+            
+    def run_baseline_measurement(self):
+        """ベースライン性能測定"""
+        start_time = time.time()
+        logger.info("ベースライン測定開始")
+        
+        try:
+            # 銘柄リストの準備
+            learn_list, oos_list = self._prepare_universe()
+            
+            # データの取得
+            price_cache = self._load_data(learn_list + oos_list)
+            
+            # 有効な戦略の取得
+            enabled_strategies = config.get_enabled_strategies()
+            logger.info(f"ベースライン測定戦略: {enabled_strategies}")
+            
+            # 戦略ごとの実行（簡易版）
+            for strategy_name in enabled_strategies:
+                logger.info(f"戦略 {strategy_name} のベースライン測定")
+                self._run_baseline_strategy(strategy_name, learn_list, oos_list, price_cache)
+                
+            # 実行時間の記録
+            execution_time = time.time() - start_time
+            logger.info(f"ベースライン測定完了: {execution_time:.2f}秒")
+            
+        except Exception as e:
+            logger.error(f"ベースライン測定エラー: {e}")
             raise
             
     def _prepare_universe(self) -> Tuple[List[str], List[str]]:
@@ -182,6 +212,36 @@ class EnhancedBacktestRunner:
             
         except Exception as e:
             logger.error(f"戦略実行エラー {strategy_name}: {e}")
+            
+    def _run_baseline_strategy(self, strategy_name: str, learn_list: List[str], 
+                              oos_list: List[str], price_cache: Dict[str, pd.DataFrame]):
+        """ベースライン戦略の実行（簡易版）"""
+        try:
+            # デフォルトパラメータを使用してクイック評価
+            strategy_params = config.get_strategy_params(strategy_name)
+            
+            # 最初のパラメータセットを使用（ベースライン用）
+            if strategy_params:
+                first_params = {}
+                for key, value_list in strategy_params.items():
+                    if isinstance(value_list, list) and value_list:
+                        first_params[key] = value_list[0]
+                    else:
+                        first_params[key] = value_list
+                        
+                logger.info(f"ベースラインパラメータ {strategy_name}: {first_params}")
+                
+                # 簡易評価（学習データの一部のみ使用）
+                sample_learn = learn_list[:min(3, len(learn_list))]  # 最大3銘柄
+                sample_oos = oos_list[:min(2, len(oos_list))]  # 最大2銘柄
+                
+                # パラメータ最適化なしで評価
+                self._evaluate_strategy(strategy_name, sample_oos, price_cache, first_params)
+            else:
+                logger.warning(f"パラメータが設定されていません: {strategy_name}")
+                
+        except Exception as e:
+            logger.error(f"ベースライン戦略実行エラー {strategy_name}: {e}")
             
     def _generate_param_combinations(self, params: Dict[str, List]) -> List[Dict[str, Any]]:
         """パラメータの組み合わせを生成"""
@@ -443,10 +503,23 @@ class EnhancedBacktestRunner:
 
 def main():
     """メイン実行関数"""
+    parser = argparse.ArgumentParser(description="Enhanced Backtest Runner")
+    parser.add_argument("--baseline-only", action="store_true", 
+                        help="Run baseline performance measurement only")
+    
+    args = parser.parse_args()
+    
     try:
         # バックテスト実行
         runner = EnhancedBacktestRunner()
-        runner.run_backtest()
+        
+        if args.baseline_only:
+            logger.info("ベースライン測定モードで実行")
+            # ベースライン測定のみ実行
+            runner.run_baseline_measurement()
+        else:
+            # 通常のバックテスト実行
+            runner.run_backtest()
         
         logger.info("バックテスト正常完了")
         
