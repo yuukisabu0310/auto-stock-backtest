@@ -15,7 +15,12 @@ def load_improvement_history():
         history_file = Path("data/improvement_history.json")
         if history_file.exists():
             with open(history_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
+                data = json.load(f)
+            # 旧形式（リスト）/新形式（辞書）の両対応
+            if isinstance(data, list):
+                return {"improvements": data, "summary": {}}
+            if isinstance(data, dict):
+                return data
     except Exception:
         pass
     return {"improvements": [], "summary": {}}
@@ -461,18 +466,18 @@ def generate_dashboard():
             // パフォーマンスチャート
             const ctx = document.getElementById('performanceChart').getContext('2d');
             const performanceData = {
-                labels: {strategy_labels},
+                labels: {{strategy_labels}},
                 datasets: [
                     {
                         label: '総リターン (%)',
-                        data: {return_data},
+                        data: {{return_data}},
                         borderColor: '#3498db',
                         backgroundColor: 'rgba(52, 152, 219, 0.1)',
                         tension: 0.4
                     },
                     {
                         label: 'シャープレシオ',
-                        data: {sharpe_data},
+                        data: {{sharpe_data}},
                         borderColor: '#27ae60',
                         backgroundColor: 'rgba(39, 174, 96, 0.1)',
                         tension: 0.4,
@@ -527,9 +532,9 @@ def generate_dashboard():
     sharpe_data = [backtest_summary[s].get('sharpe_ratio', 0) for s in strategy_labels]
     
     # データをJSON形式で埋め込み
-    html_content = html_content.replace('{strategy_labels}', json.dumps(strategy_labels))
-    html_content = html_content.replace('{return_data}', json.dumps(return_data))
-    html_content = html_content.replace('{sharpe_data}', json.dumps(sharpe_data))
+    html_content = html_content.replace('{{strategy_labels}}', json.dumps(strategy_labels))
+    html_content = html_content.replace('{{return_data}}', json.dumps(return_data))
+    html_content = html_content.replace('{{sharpe_data}}', json.dumps(sharpe_data))
     
     return html_content
 
