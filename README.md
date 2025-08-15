@@ -186,3 +186,7 @@ pip install -r requirements.txt
 ## ライセンス
 
 MIT License
+
+## 更新履歴
+
+- 2025-08-15: ドキュメント微修正（モバイルからのコミット検証）
