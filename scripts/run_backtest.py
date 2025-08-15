@@ -246,7 +246,18 @@ def main():
         df_ho_nonai  = eval_group(rand_oos, "HOLDOUT_nonAI", use_holdout=True)
         df_ho_fixed  = eval_group(fixed,    "HOLDOUT_fixed",  use_holdout=True)
 
-        out = pd.concat([df_oos_nonai, df_oos_fixed, df_ho_nonai, df_ho_fixed], ignore_index=True)
+        # 空のDataFrameを除外してからconcat
+        dfs_to_concat = []
+        for df, name in [(df_oos_nonai, "df_oos_nonai"), (df_oos_fixed, "df_oos_fixed"), 
+                         (df_ho_nonai, "df_ho_nonai"), (df_ho_fixed, "df_ho_fixed")]:
+            if df is not None and not df.empty:
+                dfs_to_concat.append(df)
+        
+        if dfs_to_concat:
+            out = pd.concat(dfs_to_concat, ignore_index=True)
+        else:
+            # 全て空の場合は空のDataFrameを作成
+            out = pd.DataFrame()
         out.to_csv(os.path.join(strat_dir, "_all_summary.csv"), index=False)
 
         with open(os.path.join(strat_dir, "_params.txt"),"w",encoding="utf-8") as f:

@@ -1,59 +1,38 @@
-# Auto Stock Backtest Bot (Enhanced Version)
+# Auto Stock Backtest
 
-このプロジェクトは、テクニカル指標やファンダメンタル条件を元に株式売買戦略を検証し、Slack通知まで自動化する仕組みです。  
-GitHub Actionsを利用して、定期的に日本株・米国株を対象としたバックテストを実行します。
+自動株式バックテストシステム
 
-## 🚀 新機能・改善点
+## 概要
 
-### **🤖 AI改善ループシステム**
-- **自動改善提案**: パフォーマンス分析に基づくAI改善提案生成
-- **検証モード/採用モード**: 安全な改善検証と本格導入の分離
-- **改善履歴管理**: 全改善の履歴保存とロールバック機能
-- **無限ループ防止**: 類似改善の検出と重複防止
-- **Slack通知**: 改善結果と詳細レポートの自動通知
+このプロジェクトは、複数のトレーディング戦略を使用した自動株式バックテストシステムです。Walk-Forward Optimization (WFO) を使用して過学習を防ぎ、AI改善ループシステムにより自動的に戦略を最適化します。
 
-### **拡張性の高いアーキテクチャ**
-- **設定ファイルベース**: `config.yaml`で全パラメータを管理
-- **戦略ファクトリー**: 新しい戦略を簡単に追加可能
-- **モジュラー設計**: 各機能が独立したモジュールとして実装
+## 機能
 
-### **高度なデータ管理**
-- **キャッシュ機能**: データ取得の高速化
-- **品質チェック**: 異常値検出と自動修正
-- **リトライ機能**: ネットワークエラーの自動復旧
+### 基本機能
+- 複数のトレーディング戦略のバックテスト
+- Walk-Forward Optimization (WFO)
+- 包括的な評価指標
+- HTMLレポート生成
 
-### **包括的な評価指標**
-- **基本指標**: シャープレシオ、ソルティノレシオ、カルマーレシオ
-- **リスク指標**: VaR、CVaR、潰瘍指数
-- **取引指標**: 勝率、利益因子、連続勝敗
-- **安定性指標**: パラメータ安定性、正規性検定
+### 拡張版機能
+- **AI改善ループシステム**: 自動的な戦略最適化
+- **多様な戦略**: 12種類のトレーディング戦略
+- **リスク管理**: 統合されたリスク管理機能
+- **設定管理**: 環境変数による動的設定
+- **ログ機能**: 構造化されたログシステム
+- **データ管理**: キャッシュ機能付きデータ取得
 
-### **強化されたリスク管理**
-- **ポジションサイズ制御**: 資金の最大リスク割合制限
-- **ストップロス/利確**: 自動損益管理
-- **ドローダウン制限**: 最大損失制限
-- **ボラティリティ調整**: ATRベースのポジションサイズ
+### AI改善ループシステム
+- **検証モード**: 別ブランチでテスト、成功時のみマージ
+- **採用モード**: 成功時自動的にmainブランチにマージ
+- **改善履歴**: 全改善の履歴管理とロールバック機能
+- **無限ループ防止**: 類似改善の検出
+- **Slack通知**: 改善結果と詳細の通知
+- **自動PR作成**: 検証モードでの自動PR作成
 
-### **詳細なログ・監視**
-- **構造化ログ**: 詳細な実行ログとエラー追跡
-- **ログローテーション**: 自動ログファイル管理
-- **パフォーマンス監視**: 実行時間とリソース使用量
+## 実行方法
 
-## 機能概要
-
-- **株価データ取得**: yfinance を利用して日本株・米国株のOHLCVデータを取得
-- **学習/検証分離**: 学習用銘柄はランダム抽出、検証用銘柄はランダム＋Slack指定銘柄
-- **複数戦略対応**: `FixedSma` と `SmaCross` の2種類の売買戦略を並列評価
-- **Walk-Forward 検証**: 過去データを分割して順次評価し、過学習を回避
-- **Slack連携**: 実行結果やパラメータをSlackチャンネルに通知
-- **GitHub Actions自動化**: 定期的にバックテストを実行し、レポートを出力
-
-## 🚀 実行方法
-
-### 動作確認（軽量設定）
-
-動作確認時は軽量設定で素早くテストできます：
-
+### 動作確認モード（推奨）
 ```powershell
 # 動作確認モード設定
 .\scripts\setup_test_mode.ps1
@@ -62,18 +41,7 @@ GitHub Actionsを利用して、定期的に日本株・米国株を対象とし
 python -m scripts.run_backtest_enhanced
 ```
 
-**動作確認設定内容:**
-- 期間: 2020-01-01 ～ 2023-12-31 (4年)
-- 資金: $10,000
-- 学習銘柄: 4銘柄
-- 検証銘柄: 3銘柄
-- 実行戦略: 全11戦略
-- AI改善: 無効
-
-### 本番実行（完全設定）
-
-本番実行時は完全設定で詳細な分析を行います：
-
+### 本番モード
 ```powershell
 # 本番モード設定
 .\scripts\setup_production_mode.ps1
@@ -82,101 +50,138 @@ python -m scripts.run_backtest_enhanced
 python -m scripts.run_backtest_enhanced
 ```
 
-**本番設定内容:**
-- 期間: 2005-01-01 ～ 現在 (18年)
-- 資金: $100,000
-- 学習銘柄: 12銘柄
-- 検証銘柄: 8銘柄
-- 実行戦略: 全11戦略
-- AI改善: 有効
+### GitHub Push with Workflow Check
+```powershell
+# 初回設定（GitHub Token設定）
+.\scripts\setup_github_token.ps1
 
-### 従来の実行方法
+# プッシュとワークフローチェック
+.\scripts\git_push_with_workflow_check.ps1
 
-従来の実行方法も引き続き利用可能です：
+# カスタムメッセージ付き
+.\scripts\git_push_with_workflow_check.ps1 -CommitMessage "機能追加: 新戦略実装"
+
+# ワークフローチェックをスキップ
+.\scripts\git_push_with_workflow_check.ps1 -SkipWorkflowCheck
+```
+
+## 戦略一覧
+
+### 基本戦略
+1. **FixedSma**: 固定SMA戦略
+2. **SmaCross**: SMAクロス戦略
+
+### 追加戦略
+3. **MovingAverageBreakout**: 移動平均ブレイクアウト
+4. **DonchianChannel**: ドンチャンチャンネル
+5. **MACDStrategy**: MACD戦略
+6. **RSIMomentum**: RSIモメンタム
+7. **RSIExtreme**: RSI極値
+8. **BollingerBands**: ボリンジャーバンド
+9. **SqueezeStrategy**: スクイーズ戦略
+10. **VolumeBreakout**: ボリュームブレイクアウト
+11. **OBVStrategy**: OBV戦略
+
+## 設定
+
+### 環境変数
+- `BACKTEST_START_DATE`: バックテスト開始日
+- `BACKTEST_END_DATE`: バックテスト終了日
+- `BACKTEST_CASH`: 初期資金
+- `SAMPLE_SIZE`: サンプルサイズ
+- `AI_IMPROVEMENT_ENABLED`: AI改善有効/無効
+
+### Slack通知設定
+```bash
+# AI改善専用
+SLACK_WEBHOOK_URL_AI_IMPROVEMENT=https://hooks.slack.com/services/...
+
+# バックテスト結果
+SLACK_WEBHOOK_URL_BACKTEST_RESULTS=https://hooks.slack.com/services/...
+
+# 開発通知
+SLACK_WEBHOOK_URL_DEV_NOTIFICATIONS=https://hooks.slack.com/services/...
+```
+
+## ファイル構成
+
+```
+auto-stock-backtest/
+├── README.md
+├── requirements.txt
+├── config.yaml
+├── scripts/
+│   ├── run_backtest.py
+│   ├── run_backtest_enhanced.py
+│   ├── check_workflows.py
+│   ├── git_push_with_workflow_check.ps1
+│   ├── setup_github_token.ps1
+│   ├── setup_test_mode.ps1
+│   └── setup_production_mode.ps1
+├── src/
+│   ├── config.py
+│   ├── logger.py
+│   ├── data_manager.py
+│   ├── strategy_base.py
+│   ├── enhanced_metrics.py
+│   ├── improvement_history.py
+│   ├── ai_improver.py
+│   └── walkforward.py
+├── .github/workflows/
+│   ├── backtest.yml
+│   └── ai_improvement_loop.yml
+├── reports/
+├── data/
+└── logs/
+```
+
+## GitHub Actions
+
+### Daily Backtest
+- 毎日自動実行
+- 全戦略のバックテスト
+- 結果をSlackに通知
+
+### AI Improvement Loop
+- 検証モード: 毎日自動実行
+- 採用モード: 手動実行
+- 改善提案生成・テスト・評価
+- 成功時自動マージ
+
+## ワークフローチェック機能
+
+プッシュ後にワークフローの実行状況を自動チェックします：
+
+```powershell
+# 手動チェック
+python -m scripts.check_workflows
+
+# 自動チェック付きプッシュ
+.\scripts\git_push_with_workflow_check.ps1
+```
+
+### チェック対象
+- Daily Backtest
+- AI Improvement Loop
+
+### 機能
+- ワークフロー実行状況の監視
+- 完了待機（最大30分）
+- 成功/失敗の判定
+- 詳細レポート生成
+
+## インストール
 
 ```bash
-# 従来のバックテスト実行
-python -m scripts.run_backtest
-
-# 改善されたバックテスト実行
-python -m scripts.run_backtest_enhanced
+pip install -r requirements.txt
 ```
 
-## ディレクトリ構成
+## 使用方法
 
-```
-.
-├── scripts/
-│   ├── run_backtest.py          # メイン実行スクリプト
-│   ├── fetch_oos_from_slack.py  # Slackから検証銘柄を取得
-│   ├── notify_slack.py          # Slack通知
-│   └── make_index.py            # インデックス生成(オプション)
-├── src/
-│   ├── walkforward.py           # Walk-forward 検証ロジック
-│   ├── strategies.py            # 売買戦略クラス (FixedSma, SmaCross等)
-│   ├── metrics.py               # 評価指標計算
-│   ├── report.py                # レポート出力
-│   ├── sampler.py               # 層化ランダムサンプリング
-│   ├── universe.py              # 銘柄リスト管理
-├── .github/workflows/
-│   └── backtest.yml             # GitHub Actions設定
-└── README.md
-```
-
-## 必要環境
-
-- Python 3.11+
-- 必須パッケージ（`requirements.txt`参照）
-- GitHub Actions 実行環境
-- Slack Bot Token (通知用)
-
-## セットアップ手順
-
-1. **リポジトリ作成**  
-   GitHubに新規リポジトリを作成し、本プロジェクトのファイルを配置。
-
-2. **Slackアプリ作成**  
-   - Slack API から新規アプリを作成
-   - `chat:write` 権限を付与
-   - Bot Tokenを発行し、GitHub Secretsに保存（例: `SLACK_BOT_TOKEN`）
-
-3. **GitHub Secrets設定**  
-   リポジトリ設定 → `Secrets and variables` → `Actions` にて以下を登録
-   - `SLACK_BOT_TOKEN`: Slack Botのトークン
-   - `SLACK_CHANNEL`: 通知先チャンネル名
-   - `SLACK_WEBHOOK_URL`: Slack Webhook URL（AI改善通知用）
-   - その他必要な環境変数（銘柄リスト、サンプル数など）
-
-4. **ワークフロー有効化**  
-   - `.github/workflows/backtest.yml` のスケジュールを設定し、自動実行を有効化
-   - `.github/workflows/ai_improvement_loop.yml` のAI改善ループを有効化
-
-5. **ローカルテスト（任意）**  
-   ```bash
-   python -m scripts.run_backtest_enhanced
-   ```
-
-## 実行結果
-
-### **通常のバックテスト**
-- 実行後、`reports/` フォルダに以下が生成されます
-  - `{戦略名}_all_summary.csv` : 銘柄別検証結果一覧
-  - `{戦略名}_params.txt` : ベストパラメータと実行条件
-  - Slackに結果概要が通知されます
-
-### **AI改善ループ**
-- **改善提案**: `improvement_proposals.json`
-- **テスト結果**: `test_results.json`
-- **改善履歴**: `data/improvement_history.json`
-- **履歴レポート**: `reports/improvement_history.html`
-- **Slack通知**: 改善結果と詳細レポートが自動通知
-
-## 注意事項
-
-- yfinanceの仕様変更や銘柄コード不一致によりデータ取得に失敗する場合があります
-- 日本株は `.T`（東証）を付与したコードを使用してください（例: `7203.T`）
-- 学習データが不足している場合はスキップされます
-- GitHub Actionsのストレージは一時的です。成果物を長期保存する場合は外部ストレージやSlackファイル送信を利用してください
+1. 設定ファイル `config.yaml` を編集
+2. 環境変数を設定（必要に応じて）
+3. バックテストを実行
+4. 結果を確認
 
 ## ライセンス
 

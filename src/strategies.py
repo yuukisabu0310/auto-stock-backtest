@@ -5,8 +5,30 @@ import numpy as np
 
 # ATR（Average True Range）の計算
 def atr(h, l, c, n=14):
-    tr = np.maximum(h - l, np.maximum(abs(h - c.shift(1)), abs(l - c.shift(1))))
-    return tr.rolling(n).mean()
+    # backtestingの_Arrayオブジェクトに対応したATR計算
+    h_array = np.array(h)
+    l_array = np.array(l)
+    c_array = np.array(c)
+    
+    # 前日終値を計算（1つシフト）
+    c_shifted = np.roll(c_array, 1)
+    c_shifted[0] = c_array[0]  # 最初の値は同じにする
+    
+    # True Range計算
+    tr1 = h_array - l_array
+    tr2 = np.abs(h_array - c_shifted)
+    tr3 = np.abs(l_array - c_shifted)
+    tr = np.maximum(tr1, np.maximum(tr2, tr3))
+    
+    # 移動平均計算
+    atr_values = np.zeros_like(tr)
+    for i in range(len(tr)):
+        if i < n - 1:
+            atr_values[i] = np.nan
+        else:
+            atr_values[i] = np.mean(tr[i-n+1:i+1])
+    
+    return atr_values
 
 # ===== 固定SMA戦略 =====
 class FixedSma(Strategy):
@@ -61,7 +83,7 @@ class SmaCross(Strategy):
         if crossover(self.sma_fast, self.sma_slow):
             if not self.position.is_long and size > 0:
                 self.position.close()
-                self.buy(size=size, limit=px)
+                self.buy(size=size)
         elif crossover(self.sma_slow, self.sma_fast):
             if self.position.is_long:
-                self.position.close(limit=px)
+                self.position.close()
