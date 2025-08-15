@@ -27,28 +27,28 @@ Write-Host ""
 Write-Host "2. 変更をステージング中..." -ForegroundColor Yellow
 git add .
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ ステージングに失敗しました" -ForegroundColor Red
+    Write-Host "ステージングに失敗しました" -ForegroundColor Red
     exit 1
 }
-Write-Host "✅ ステージング完了" -ForegroundColor Green
+Write-Host "ステージング完了" -ForegroundColor Green
 
 # 3. コミット
 Write-Host "3. コミット中..." -ForegroundColor Yellow
 git commit -m $CommitMessage
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ コミットに失敗しました" -ForegroundColor Red
+    Write-Host "コミットに失敗しました" -ForegroundColor Red
     exit 1
 }
-Write-Host "✅ コミット完了" -ForegroundColor Green
+Write-Host "コミット完了" -ForegroundColor Green
 
 # 4. プッシュ
 Write-Host "4. GitHubにプッシュ中..." -ForegroundColor Yellow
 git push origin main
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ プッシュに失敗しました" -ForegroundColor Red
+    Write-Host "プッシュに失敗しました" -ForegroundColor Red
     exit 1
 }
-Write-Host "✅ プッシュ完了" -ForegroundColor Green
+Write-Host "プッシュ完了" -ForegroundColor Green
 
 # 5. ワークフローチェック（スキップ指定がない場合）
 if (-not $SkipWorkflowCheck) {
@@ -63,13 +63,14 @@ if (-not $SkipWorkflowCheck) {
     try {
         python -m scripts.check_workflows
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "🎉 全ワークフローが正常完了しました！" -ForegroundColor Green
+            Write-Host "全ワークフローが正常完了しました！" -ForegroundColor Green
         } else {
-            Write-Host "⚠️ 一部のワークフローで問題が発生しました" -ForegroundColor Yellow
+            Write-Host "一部のワークフローで問題が発生しました" -ForegroundColor Yellow
             Write-Host "詳細はログを確認してください" -ForegroundColor Gray
         }
-    } catch {
-        Write-Host "❌ ワークフローチェック実行エラー: $_" -ForegroundColor Red
+    }
+    catch {
+        Write-Host "ワークフローチェック実行エラー: $_" -ForegroundColor Red
         Write-Host "手動でGitHub Actionsを確認してください" -ForegroundColor Yellow
     }
 } else {
