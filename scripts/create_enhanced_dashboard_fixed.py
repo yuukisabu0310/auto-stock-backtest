@@ -640,13 +640,13 @@ def generate_enhanced_dashboard():
                                         </div>
                                         <div class="metric-item">
                                             <div class="metric-label">
-                                                サンプル数
+                                                トレード数
                                                 <span class="tooltip">
                                                     <span class="help-icon">?</span>
-                                                    <span class="tooltiptext">テスト対象の銘柄数。統計的信頼性の指標です。</span>
+                                                    <span class="tooltiptext">期間中に実行された総トレード数。サンプルサイズの指標です。</span>
                                                 </span>
                                             </div>
-                                            <div class="metric-value neutral">{ranking['sample_size']}</div>
+                                            <div class="metric-value neutral">{ranking['total_trades']}</div>
                                         </div>
                                     </div>
                                 </div>
