@@ -1,0 +1,9 @@
+folds,avg_sharpe,avg_return_%,avg_max_dd_%,trades_sum,ticker,strategy,params
+15,0.27453879081585464,0.3183563478607248,-0.8452771330527575,0,2914.T,MACD,"{'macd_fast': 12, 'macd_slow': 26, 'macd_signal': 9, 'volume_multiplier': 1.0}"
+15,-0.08900748319578432,0.0,-1.229800907220946,0,3382.T,MACD,"{'macd_fast': 12, 'macd_slow': 26, 'macd_signal': 9, 'volume_multiplier': 1.0}"
+15,0.1346169369462688,0.040398146657564214,-1.3442589328689247,0,4523.T,MACD,"{'macd_fast': 12, 'macd_slow': 26, 'macd_signal': 9, 'volume_multiplier': 1.0}"
+15,-0.06601638259315296,0.0,-1.13699440100401,0,8411.T,MACD,"{'macd_fast': 12, 'macd_slow': 26, 'macd_signal': 9, 'volume_multiplier': 1.0}"
+15,0.2929578362103859,0.22396032449314954,-1.1018354710086609,0,9432.T,MACD,"{'macd_fast': 12, 'macd_slow': 26, 'macd_signal': 9, 'volume_multiplier': 1.0}"
+15,0.41129996255718115,0.21412233904398453,-0.6309244572453632,0,DIA,MACD,"{'macd_fast': 12, 'macd_slow': 26, 'macd_signal': 9, 'volume_multiplier': 1.0}"
+15,0.4500104911053903,0.0,-1.2936047212726898,0,INTC,MACD,"{'macd_fast': 12, 'macd_slow': 26, 'macd_signal': 9, 'volume_multiplier': 1.0}"
+15,0.21848050397254315,0.0,-1.5748032636414666,0,QCOM,MACD,"{'macd_fast': 12, 'macd_slow': 26, 'macd_signal': 9, 'volume_multiplier': 1.0}"

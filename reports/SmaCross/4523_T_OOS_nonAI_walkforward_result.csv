@@ -1,0 +1,239 @@
+Start,End,Duration,Exposure Time [%],Equity Final [$],Equity Peak [$],Return [%],Buy & Hold Return [%],Return (Ann.) [%],Volatility (Ann.) [%],CAGR [%],Sharpe Ratio,Sortino Ratio,Calmar Ratio,Alpha [%],Beta,Max. Drawdown [%],Avg. Drawdown [%],Max. Drawdown Duration,Avg. Drawdown Duration,# Trades,Win Rate [%],Best Trade [%],Worst Trade [%],Avg. Trade [%],Max. Trade Duration,Avg. Trade Duration,Profit Factor,Expectancy [%],SQN,Kelly Criterion,_strategy,_equity_curve,_trades,Ticker,n_fast,n_slow,train_start,train_end,test_start,test_end
+2010-01-04,2010-12-30,360 days,0.0,100000.0,100000.0,0.0,-9.810843217489085,0.0,0.0,0.0,,,,0.0,0.0,-0.0,,,,0,,,,,,,,,,,"SmaCross(n_fast=15,n_slow=60)","              Equity  DrawdownPct  DrawdownDuration
+Date                                               
+2010-01-04  100000.0          0.0               NaN
+2010-01-05  100000.0          0.0               NaN
+2010-01-06  100000.0          0.0               NaN
+2010-01-07  100000.0          0.0               NaN
+2010-01-08  100000.0          0.0               NaN
+...              ...          ...               ...
+2010-12-24  100000.0          0.0               NaN
+2010-12-27  100000.0          0.0               NaN
+2010-12-28  100000.0          0.0               NaN
+2010-12-29  100000.0          0.0               NaN
+2010-12-30  100000.0          0.0               NaN
+
+[243 rows x 3 columns]","Empty DataFrame
+Columns: [Size, EntryBar, ExitBar, EntryPrice, ExitPrice, SL, TP, PnL, Commission, ReturnPct, EntryTime, ExitTime, Duration, Tag]
+Index: []",4523.T,15,60,2005-01-03,2010-01-02,2010-01-03,2011-01-02
+2011-01-04,2011-12-30,360 days,0.0,100000.0,100000.0,0.0,9.130630937632102,0.0,0.0,0.0,,,,0.0,0.0,-0.0,,,,0,,,,,,,,,,,"SmaCross(n_fast=15,n_slow=60)","              Equity  DrawdownPct  DrawdownDuration
+Date                                               
+2011-01-04  100000.0          0.0               NaN
+2011-01-05  100000.0          0.0               NaN
+2011-01-06  100000.0          0.0               NaN
+2011-01-07  100000.0          0.0               NaN
+2011-01-11  100000.0          0.0               NaN
+...              ...          ...               ...
+2011-12-26  100000.0          0.0               NaN
+2011-12-27  100000.0          0.0               NaN
+2011-12-28  100000.0          0.0               NaN
+2011-12-29  100000.0          0.0               NaN
+2011-12-30  100000.0          0.0               NaN
+
+[245 rows x 3 columns]","Empty DataFrame
+Columns: [Size, EntryBar, ExitBar, EntryPrice, ExitPrice, SL, TP, PnL, Commission, ReturnPct, EntryTime, ExitTime, Duration, Tag]
+Index: []",4523.T,15,60,2006-01-03,2011-01-02,2011-01-03,2012-01-02
+2012-01-04,2012-12-28,359 days,0.0,100000.0,100000.0,0.0,12.277982277621039,0.0,0.0,0.0,,,,0.0,0.0,-0.0,,,,0,,,,,,,,,,,"SmaCross(n_fast=15,n_slow=60)","              Equity  DrawdownPct  DrawdownDuration
+Date                                               
+2012-01-04  100000.0          0.0               NaN
+2012-01-05  100000.0          0.0               NaN
+2012-01-06  100000.0          0.0               NaN
+2012-01-10  100000.0          0.0               NaN
+2012-01-11  100000.0          0.0               NaN
+...              ...          ...               ...
+2012-12-21  100000.0          0.0               NaN
+2012-12-25  100000.0          0.0               NaN
+2012-12-26  100000.0          0.0               NaN
+2012-12-27  100000.0          0.0               NaN
+2012-12-28  100000.0          0.0               NaN
+
+[248 rows x 3 columns]","Empty DataFrame
+Columns: [Size, EntryBar, ExitBar, EntryPrice, ExitPrice, SL, TP, PnL, Commission, ReturnPct, EntryTime, ExitTime, Duration, Tag]
+Index: []",4523.T,15,60,2007-01-03,2012-01-02,2012-01-03,2013-01-02
+2013-01-04,2013-12-30,360 days,0.0,100000.0,100000.0,0.0,4.154401036210997,0.0,0.0,0.0,,,,0.0,0.0,-0.0,,,,0,,,,,,,,,,,"SmaCross(n_fast=15,n_slow=60)","              Equity  DrawdownPct  DrawdownDuration
+Date                                               
+2013-01-04  100000.0          0.0               NaN
+2013-01-07  100000.0          0.0               NaN
+2013-01-08  100000.0          0.0               NaN
+2013-01-09  100000.0          0.0               NaN
+2013-01-10  100000.0          0.0               NaN
+...              ...          ...               ...
+2013-12-24  100000.0          0.0               NaN
+2013-12-25  100000.0          0.0               NaN
+2013-12-26  100000.0          0.0               NaN
+2013-12-27  100000.0          0.0               NaN
+2013-12-30  100000.0          0.0               NaN
+
+[245 rows x 3 columns]","Empty DataFrame
+Columns: [Size, EntryBar, ExitBar, EntryPrice, ExitPrice, SL, TP, PnL, Commission, ReturnPct, EntryTime, ExitTime, Duration, Tag]
+Index: []",4523.T,15,60,2008-01-03,2013-01-02,2013-01-03,2014-01-02
+2014-01-06,2014-12-30,358 days,0.0,100000.0,100000.0,0.0,21.56137630970202,0.0,0.0,0.0,,,,0.0,0.0,-0.0,,,,0,,,,,,,,,,,"SmaCross(n_fast=15,n_slow=60)","              Equity  DrawdownPct  DrawdownDuration
+Date                                               
+2014-01-06  100000.0          0.0               NaN
+2014-01-07  100000.0          0.0               NaN
+2014-01-08  100000.0          0.0               NaN
+2014-01-09  100000.0          0.0               NaN
+2014-01-10  100000.0          0.0               NaN
+...              ...          ...               ...
+2014-12-24  100000.0          0.0               NaN
+2014-12-25  100000.0          0.0               NaN
+2014-12-26  100000.0          0.0               NaN
+2014-12-29  100000.0          0.0               NaN
+2014-12-30  100000.0          0.0               NaN
+
+[244 rows x 3 columns]","Empty DataFrame
+Columns: [Size, EntryBar, ExitBar, EntryPrice, ExitPrice, SL, TP, PnL, Commission, ReturnPct, EntryTime, ExitTime, Duration, Tag]
+Index: []",4523.T,15,60,2009-01-03,2014-01-02,2014-01-03,2015-01-02
+2015-01-05,2015-12-30,359 days,0.0,100000.0,100000.0,0.0,-4.655004507056725,0.0,0.0,0.0,,,,0.0,0.0,-0.0,,,,0,,,,,,,,,,,"SmaCross(n_fast=15,n_slow=60)","              Equity  DrawdownPct  DrawdownDuration
+Date                                               
+2015-01-05  100000.0          0.0               NaN
+2015-01-06  100000.0          0.0               NaN
+2015-01-07  100000.0          0.0               NaN
+2015-01-08  100000.0          0.0               NaN
+2015-01-09  100000.0          0.0               NaN
+...              ...          ...               ...
+2015-12-24  100000.0          0.0               NaN
+2015-12-25  100000.0          0.0               NaN
+2015-12-28  100000.0          0.0               NaN
+2015-12-29  100000.0          0.0               NaN
+2015-12-30  100000.0          0.0               NaN
+
+[244 rows x 3 columns]","Empty DataFrame
+Columns: [Size, EntryBar, ExitBar, EntryPrice, ExitPrice, SL, TP, PnL, Commission, ReturnPct, EntryTime, ExitTime, Duration, Tag]
+Index: []",4523.T,15,60,2010-01-03,2015-01-02,2015-01-03,2016-01-02
+2016-01-04,2016-12-30,361 days,0.0,100000.0,100000.0,0.0,-1.6332406359154883,0.0,0.0,0.0,,,,0.0,0.0,-0.0,,,,0,,,,,,,,,,,"SmaCross(n_fast=15,n_slow=60)","              Equity  DrawdownPct  DrawdownDuration
+Date                                               
+2016-01-04  100000.0          0.0               NaN
+2016-01-05  100000.0          0.0               NaN
+2016-01-06  100000.0          0.0               NaN
+2016-01-07  100000.0          0.0               NaN
+2016-01-08  100000.0          0.0               NaN
+...              ...          ...               ...
+2016-12-26  100000.0          0.0               NaN
+2016-12-27  100000.0          0.0               NaN
+2016-12-28  100000.0          0.0               NaN
+2016-12-29  100000.0          0.0               NaN
+2016-12-30  100000.0          0.0               NaN
+
+[245 rows x 3 columns]","Empty DataFrame
+Columns: [Size, EntryBar, ExitBar, EntryPrice, ExitPrice, SL, TP, PnL, Commission, ReturnPct, EntryTime, ExitTime, Duration, Tag]
+Index: []",4523.T,15,60,2011-01-03,2016-01-02,2016-01-03,2017-01-02
+2017-01-04,2018-01-02,363 days,0.0,100000.0,100000.0,0.0,11.19934323727913,0.0,0.0,0.0,,,,0.0,0.0,-0.0,,,,0,,,,,,,,,,,"SmaCross(n_fast=15,n_slow=60)","              Equity  DrawdownPct  DrawdownDuration
+Date                                               
+2017-01-04  100000.0          0.0               NaN
+2017-01-05  100000.0          0.0               NaN
+2017-01-06  100000.0          0.0               NaN
+2017-01-10  100000.0          0.0               NaN
+2017-01-11  100000.0          0.0               NaN
+...              ...          ...               ...
+2017-12-27  100000.0          0.0               NaN
+2017-12-28  100000.0          0.0               NaN
+2017-12-29  100000.0          0.0               NaN
+2018-01-01  100000.0          0.0               NaN
+2018-01-02  100000.0          0.0               NaN
+
+[255 rows x 3 columns]","Empty DataFrame
+Columns: [Size, EntryBar, ExitBar, EntryPrice, ExitPrice, SL, TP, PnL, Commission, ReturnPct, EntryTime, ExitTime, Duration, Tag]
+Index: []",4523.T,15,60,2012-01-03,2017-01-02,2017-01-03,2018-01-02
+2018-01-03,2018-12-31,362 days,0.0,100000.0,100000.0,0.0,28.00296543527377,0.0,0.0,0.0,,,,0.0,0.0,-0.0,,,,0,,,,,,,,,,,"SmaCross(n_fast=15,n_slow=60)","              Equity  DrawdownPct  DrawdownDuration
+Date                                               
+2018-01-03  100000.0          0.0               NaN
+2018-01-04  100000.0          0.0               NaN
+2018-01-05  100000.0          0.0               NaN
+2018-01-08  100000.0          0.0               NaN
+2018-01-09  100000.0          0.0               NaN
+...              ...          ...               ...
+2018-12-25  100000.0          0.0               NaN
+2018-12-26  100000.0          0.0               NaN
+2018-12-27  100000.0          0.0               NaN
+2018-12-28  100000.0          0.0               NaN
+2018-12-31  100000.0          0.0               NaN
+
+[259 rows x 3 columns]","Empty DataFrame
+Columns: [Size, EntryBar, ExitBar, EntryPrice, ExitPrice, SL, TP, PnL, Commission, ReturnPct, EntryTime, ExitTime, Duration, Tag]
+Index: []",4523.T,15,60,2013-01-03,2018-01-02,2018-01-03,2019-01-02
+2019-01-04,2019-12-30,360 days,0.0,100000.0,100000.0,0.0,30.563314237685518,0.0,0.0,0.0,,,,0.0,0.0,-0.0,,,,0,,,,,,,,,,,"SmaCross(n_fast=15,n_slow=60)","              Equity  DrawdownPct  DrawdownDuration
+Date                                               
+2019-01-04  100000.0          0.0               NaN
+2019-01-07  100000.0          0.0               NaN
+2019-01-08  100000.0          0.0               NaN
+2019-01-09  100000.0          0.0               NaN
+2019-01-10  100000.0          0.0               NaN
+...              ...          ...               ...
+2019-12-24  100000.0          0.0               NaN
+2019-12-25  100000.0          0.0               NaN
+2019-12-26  100000.0          0.0               NaN
+2019-12-27  100000.0          0.0               NaN
+2019-12-30  100000.0          0.0               NaN
+
+[241 rows x 3 columns]","Empty DataFrame
+Columns: [Size, EntryBar, ExitBar, EntryPrice, ExitPrice, SL, TP, PnL, Commission, ReturnPct, EntryTime, ExitTime, Duration, Tag]
+Index: []",4523.T,15,60,2014-01-03,2019-01-02,2019-01-03,2020-01-02
+2020-01-06,2020-12-30,359 days,0.0,100000.0,100000.0,0.0,5.471244098284736,0.0,0.0,0.0,,,,0.0,0.0,-0.0,,,,0,,,,,,,,,,,"SmaCross(n_fast=15,n_slow=60)","              Equity  DrawdownPct  DrawdownDuration
+Date                                               
+2020-01-06  100000.0          0.0               NaN
+2020-01-07  100000.0          0.0               NaN
+2020-01-08  100000.0          0.0               NaN
+2020-01-09  100000.0          0.0               NaN
+2020-01-10  100000.0          0.0               NaN
+...              ...          ...               ...
+2020-12-24  100000.0          0.0               NaN
+2020-12-25  100000.0          0.0               NaN
+2020-12-28  100000.0          0.0               NaN
+2020-12-29  100000.0          0.0               NaN
+2020-12-30  100000.0          0.0               NaN
+
+[242 rows x 3 columns]","Empty DataFrame
+Columns: [Size, EntryBar, ExitBar, EntryPrice, ExitPrice, SL, TP, PnL, Commission, ReturnPct, EntryTime, ExitTime, Duration, Tag]
+Index: []",4523.T,15,60,2015-01-03,2020-01-02,2020-01-03,2021-01-02
+2021-01-04,2021-12-30,360 days,0.0,100000.0,100000.0,0.0,-11.159500783918523,0.0,0.0,0.0,,,,0.0,0.0,-0.0,,,,0,,,,,,,,,,,"SmaCross(n_fast=15,n_slow=60)","              Equity  DrawdownPct  DrawdownDuration
+Date                                               
+2021-01-04  100000.0          0.0               NaN
+2021-01-05  100000.0          0.0               NaN
+2021-01-06  100000.0          0.0               NaN
+2021-01-07  100000.0          0.0               NaN
+2021-01-08  100000.0          0.0               NaN
+...              ...          ...               ...
+2021-12-24  100000.0          0.0               NaN
+2021-12-27  100000.0          0.0               NaN
+2021-12-28  100000.0          0.0               NaN
+2021-12-29  100000.0          0.0               NaN
+2021-12-30  100000.0          0.0               NaN
+
+[245 rows x 3 columns]","Empty DataFrame
+Columns: [Size, EntryBar, ExitBar, EntryPrice, ExitPrice, SL, TP, PnL, Commission, ReturnPct, EntryTime, ExitTime, Duration, Tag]
+Index: []",4523.T,15,60,2016-01-03,2021-01-02,2021-01-03,2022-01-02
+2022-01-04,2022-12-30,360 days,0.0,100000.0,100000.0,0.0,53.607714747686565,0.0,0.0,0.0,,,,0.0,0.0,-0.0,,,,0,,,,,,,,,,,"SmaCross(n_fast=15,n_slow=60)","              Equity  DrawdownPct  DrawdownDuration
+Date                                               
+2022-01-04  100000.0          0.0               NaN
+2022-01-05  100000.0          0.0               NaN
+2022-01-06  100000.0          0.0               NaN
+2022-01-07  100000.0          0.0               NaN
+2022-01-11  100000.0          0.0               NaN
+...              ...          ...               ...
+2022-12-26  100000.0          0.0               NaN
+2022-12-27  100000.0          0.0               NaN
+2022-12-28  100000.0          0.0               NaN
+2022-12-29  100000.0          0.0               NaN
+2022-12-30  100000.0          0.0               NaN
+
+[244 rows x 3 columns]","Empty DataFrame
+Columns: [Size, EntryBar, ExitBar, EntryPrice, ExitPrice, SL, TP, PnL, Commission, ReturnPct, EntryTime, ExitTime, Duration, Tag]
+Index: []",4523.T,15,60,2017-01-03,2022-01-02,2022-01-03,2023-01-02
+2023-01-04,2023-12-29,359 days,0.0,100000.0,100000.0,0.0,-5.126522455112875,0.0,0.0,0.0,,,,0.0,0.0,-0.0,,,,0,,,,,,,,,,,"SmaCross(n_fast=15,n_slow=60)","              Equity  DrawdownPct  DrawdownDuration
+Date                                               
+2023-01-04  100000.0          0.0               NaN
+2023-01-05  100000.0          0.0               NaN
+2023-01-06  100000.0          0.0               NaN
+2023-01-10  100000.0          0.0               NaN
+2023-01-11  100000.0          0.0               NaN
+...              ...          ...               ...
+2023-12-25  100000.0          0.0               NaN
+2023-12-26  100000.0          0.0               NaN
+2023-12-27  100000.0          0.0               NaN
+2023-12-28  100000.0          0.0               NaN
+2023-12-29  100000.0          0.0               NaN
+
+[246 rows x 3 columns]","Empty DataFrame
+Columns: [Size, EntryBar, ExitBar, EntryPrice, ExitPrice, SL, TP, PnL, Commission, ReturnPct, EntryTime, ExitTime, Duration, Tag]
+Index: []",4523.T,15,60,2018-01-03,2023-01-02,2023-01-03,2024-01-02

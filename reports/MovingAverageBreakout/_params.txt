@@ -1,0 +1,4 @@
+strategy=MovingAverageBreakout
+params={'default': True}
+learn_list=['SPY', 'QQQ', 'DIA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA']
+oos_list=['SPY', 'QQQ', 'DIA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA']

@@ -1,0 +1,6 @@
+Strategy: BollingerBands
+Timestamp: 2025-08-14 20:16:13
+
+Parameters:
+bb_period = 20
+bb_std = 1.5

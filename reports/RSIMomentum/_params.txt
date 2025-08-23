@@ -1,0 +1,8 @@
+Strategy: RSIMomentum
+Timestamp: 2025-08-14 21:08:40
+
+Parameters:
+rsi_period = 14
+rsi_entry = 50
+rsi_exit_high = 65
+rsi_exit_low = 40

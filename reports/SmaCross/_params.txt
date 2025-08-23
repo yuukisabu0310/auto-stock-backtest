@@ -1,0 +1,7 @@
+best_n_fast=15
+best_n_slow=60
+score=-0.421323
+learn_nonAI=['6954.T', 'SHOP', '8316.T', 'QCOM', '4502.T', 'QQQ', '9432.T', 'NFLX', '2914.T', '9434.T', '9433.T', 'ORCL']
+OOS_fixed=[]
+OOS_random=['3382.T', 'MU', 'SPY', '4523.T', 'INTC', '8411.T', 'DIA', '7203.T']
+holdout_months=12

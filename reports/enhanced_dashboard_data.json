@@ -1,0 +1,1413 @@
+{
+  "generated_at": "2025-08-23T15:50:33.342044",
+  "strategies": {
+    "BollingerBands": {
+      "name": "BollingerBands",
+      "summary": {
+        "total_return": -0.0707748631532158,
+        "sharpe_ratio": -0.1450085198514009,
+        "max_drawdown": -0.6673539079502522,
+        "win_rate": 50.0,
+        "profit_factor": 1.0,
+        "total_trades": 0,
+        "sample_size": 8
+      },
+      "ticker_performance": {
+        "2914": {
+          "total_return": 0.0,
+          "sharpe_ratio": 0.0984933186719767,
+          "max_drawdown": -0.3221368625721754,
+          "win_rate": 50.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 1.9074961950637563,
+          "worst_trade": -1.4714587075631615,
+          "avg_holding_period": 0.0
+        },
+        "3382": {
+          "total_return": 0.0,
+          "sharpe_ratio": -0.597481550917177,
+          "max_drawdown": -0.7777413850241444,
+          "win_rate": 25.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 1.9818819421203733,
+          "worst_trade": -4.470742639939068,
+          "avg_holding_period": 0.0
+        },
+        "4523": {
+          "total_return": 0.0,
+          "sharpe_ratio": -2.017608678867554,
+          "max_drawdown": -1.7937034863837351,
+          "win_rate": 16.666666666666664,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 1.3821410381911932,
+          "worst_trade": -5.033004733267574,
+          "avg_holding_period": 0.0
+        },
+        "8411": {
+          "total_return": 0.0,
+          "sharpe_ratio": 0.6879107946526429,
+          "max_drawdown": -0.8519358138454614,
+          "win_rate": 66.66666666666666,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 6.309232329320015,
+          "worst_trade": -0.3999870374900656,
+          "avg_holding_period": 0.0
+        },
+        "9432": {
+          "total_return": 0.0,
+          "sharpe_ratio": 0.8046713740728363,
+          "max_drawdown": -0.1997097815487181,
+          "win_rate": 100.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 2.935580444576936,
+          "worst_trade": 0.2430343551990936,
+          "avg_holding_period": 0.0
+        },
+        "DIA": {
+          "total_return": 0.0,
+          "sharpe_ratio": -0.3898859547443654,
+          "max_drawdown": -1.2261500879434897,
+          "win_rate": 66.66666666666666,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 2.822560049744037,
+          "worst_trade": -7.353071022894627,
+          "avg_holding_period": 0.0
+        },
+        "INTC": {
+          "total_return": 0.0,
+          "sharpe_ratio": -0.3854099657667807,
+          "max_drawdown": -1.1038058544520557,
+          "win_rate": 66.66666666666666,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 2.774661097233094,
+          "worst_trade": -6.422430891605248,
+          "avg_holding_period": 0.0
+        },
+        "QCOM": {
+          "total_return": 0.0,
+          "sharpe_ratio": -1.5010705131186752,
+          "max_drawdown": -1.8625861877130776,
+          "win_rate": 50.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 0.7930321389773419,
+          "worst_trade": -10.310865302220924,
+          "avg_holding_period": 0.0
+        }
+      },
+      "rolling_performance": [],
+      "trade_analysis": {},
+      "risk_metrics": {
+        "volatility": 0.0,
+        "min_return": 0.0,
+        "max_return": 0.0,
+        "avg_return": 0.0,
+        "positive_count": 0,
+        "negative_count": 0,
+        "success_rate": 0.0
+      }
+    },
+    "DonchianChannel": {
+      "name": "DonchianChannel",
+      "summary": {
+        "total_return": -1.5043182590860165,
+        "sharpe_ratio": 0.0977414971590064,
+        "max_drawdown": -0.1637779445393437,
+        "win_rate": 50.0,
+        "profit_factor": 1.0,
+        "total_trades": 35,
+        "sample_size": 8
+      },
+      "ticker_performance": {},
+      "rolling_performance": [],
+      "trade_analysis": {},
+      "risk_metrics": {}
+    },
+    "FixedSma": {
+      "name": "FixedSma",
+      "summary": {
+        "total_return": -10.328683051660736,
+        "sharpe_ratio": -0.8232025382648496,
+        "max_drawdown": -18.46214101474883,
+        "win_rate": 50.0,
+        "profit_factor": 1.0,
+        "total_trades": 0,
+        "sample_size": 16
+      },
+      "ticker_performance": {
+        "2914": {
+          "total_return": 0.0,
+          "sharpe_ratio": -0.278973427704633,
+          "max_drawdown": -1.733171269444156,
+          "win_rate": 20.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 7.436313445603791,
+          "worst_trade": -4.325480016384467,
+          "avg_holding_period": 0.0
+        },
+        "3382": {
+          "total_return": 0.0,
+          "sharpe_ratio": 0.1731633705973526,
+          "max_drawdown": -2.559881581043899,
+          "win_rate": 17.647058823529413,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 20.39795060595832,
+          "worst_trade": -4.835518713007716,
+          "avg_holding_period": 0.0
+        },
+        "4523": {
+          "total_return": 0.0,
+          "sharpe_ratio": 0.468564702934194,
+          "max_drawdown": -0.6700990237176185,
+          "win_rate": 57.14285714285714,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 4.349141004002241,
+          "worst_trade": -1.7351052487128218,
+          "avg_holding_period": 0.0
+        },
+        "8411": {
+          "total_return": 0.0,
+          "sharpe_ratio": 0.6117131874884264,
+          "max_drawdown": -2.487492927442747,
+          "win_rate": 30.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 22.035651847156217,
+          "worst_trade": -6.681128717096932,
+          "avg_holding_period": 0.0
+        },
+        "9432": {
+          "total_return": 0.0,
+          "sharpe_ratio": -2.3181985045058395,
+          "max_drawdown": -2.534815314428618,
+          "win_rate": 15.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 2.4359879797997275,
+          "worst_trade": -3.1308508901292704,
+          "avg_holding_period": 0.0
+        },
+        "DIA": {
+          "total_return": 0.0,
+          "sharpe_ratio": 1.2814921257437126,
+          "max_drawdown": -0.6629729316394717,
+          "win_rate": 40.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 7.64058911807195,
+          "worst_trade": -2.1700901277265503,
+          "avg_holding_period": 0.0
+        },
+        "INTC": {
+          "total_return": 0.0,
+          "sharpe_ratio": 0.7506713997635517,
+          "max_drawdown": -1.9736022187176627,
+          "win_rate": 37.5,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 14.699979224172267,
+          "worst_trade": -5.035498261073384,
+          "avg_holding_period": 0.0
+        },
+        "QCOM": {
+          "total_return": 0.0,
+          "sharpe_ratio": 0.631827666175264,
+          "max_drawdown": -1.671406233075079,
+          "win_rate": 36.36363636363637,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 11.091170822423122,
+          "worst_trade": -3.331172011779022,
+          "avg_holding_period": 0.0
+        }
+      },
+      "rolling_performance": [],
+      "trade_analysis": {},
+      "risk_metrics": {
+        "volatility": 0.0,
+        "min_return": 0.0,
+        "max_return": 0.0,
+        "avg_return": 0.0,
+        "positive_count": 0,
+        "negative_count": 0,
+        "success_rate": 0.0
+      }
+    },
+    "MACD": {
+      "name": "MACD",
+      "summary": {
+        "total_return": 0.3183563478607248,
+        "sharpe_ratio": 0.2745387908158546,
+        "max_drawdown": -0.8452771330527575,
+        "win_rate": 50.0,
+        "profit_factor": 1.0,
+        "total_trades": 0,
+        "sample_size": 8
+      },
+      "ticker_performance": {
+        "2914": {
+          "total_return": 0.0,
+          "sharpe_ratio": -0.9893688224476204,
+          "max_drawdown": -0.1736865343940574,
+          "win_rate": 0.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": -1.5396369743246745,
+          "worst_trade": -1.5396369743246745,
+          "avg_holding_period": 0.0
+        },
+        "3382": {
+          "total_return": 0.0,
+          "sharpe_ratio": 0.1057993495802029,
+          "max_drawdown": -2.192978664573897,
+          "win_rate": 100.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 1.7074691082295566,
+          "worst_trade": 0.0656942883426618,
+          "avg_holding_period": 0.0
+        },
+        "4523": {
+          "total_return": 0.0,
+          "sharpe_ratio": -0.9836640966478684,
+          "max_drawdown": -0.3148166927204987,
+          "win_rate": 0.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": -3.586684646607759,
+          "worst_trade": -3.586684646607759,
+          "avg_holding_period": 0.0
+        },
+        "8411": {
+          "total_return": 0.0,
+          "sharpe_ratio": NaN,
+          "max_drawdown": -0.0,
+          "win_rate": NaN,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": NaN,
+          "worst_trade": NaN,
+          "avg_holding_period": 0.0
+        },
+        "9432": {
+          "total_return": 0.0,
+          "sharpe_ratio": -0.1305797019053234,
+          "max_drawdown": -0.8886976273116742,
+          "win_rate": 0.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": -1.610539961096337,
+          "worst_trade": -1.610539961096337,
+          "avg_holding_period": 0.0
+        },
+        "DIA": {
+          "total_return": 0.0,
+          "sharpe_ratio": -0.901518141178852,
+          "max_drawdown": -1.5496455010151289,
+          "win_rate": 50.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 1.1312204635051226,
+          "worst_trade": -11.124410594172124,
+          "avg_holding_period": 0.0
+        },
+        "INTC": {
+          "total_return": 0.0,
+          "sharpe_ratio": -0.544089236891568,
+          "max_drawdown": -1.6431193939654751,
+          "win_rate": 50.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 6.900035945487754,
+          "worst_trade": -14.921429991974447,
+          "avg_holding_period": 0.0
+        },
+        "QCOM": {
+          "total_return": 0.0,
+          "sharpe_ratio": 0.5736939555673768,
+          "max_drawdown": -0.4060637626737473,
+          "win_rate": 100.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 3.701758681471304,
+          "worst_trade": 3.701758681471304,
+          "avg_holding_period": 0.0
+        }
+      },
+      "rolling_performance": [],
+      "trade_analysis": {},
+      "risk_metrics": {
+        "volatility": 0.0,
+        "min_return": 0.0,
+        "max_return": 0.0,
+        "avg_return": 0.0,
+        "positive_count": 0,
+        "negative_count": 0,
+        "success_rate": 0.0
+      }
+    },
+    "Momentum": {
+      "name": "Momentum",
+      "summary": {
+        "total_return": 0.3695393618568565,
+        "sharpe_ratio": 1.1275318518418052,
+        "max_drawdown": -2.8455484700248355,
+        "win_rate": 50.0,
+        "profit_factor": 1.0,
+        "total_trades": 1,
+        "sample_size": 8
+      },
+      "ticker_performance": {},
+      "rolling_performance": [],
+      "trade_analysis": {},
+      "risk_metrics": {}
+    },
+    "MovingAverageBreakout": {
+      "name": "MovingAverageBreakout",
+      "summary": {
+        "total_return": -1.6923321492976378,
+        "sharpe_ratio": 0.2447456326134125,
+        "max_drawdown": -0.9549864222457938,
+        "win_rate": 50.0,
+        "profit_factor": 1.0,
+        "total_trades": 8,
+        "sample_size": 8
+      },
+      "ticker_performance": {},
+      "rolling_performance": [],
+      "trade_analysis": {},
+      "risk_metrics": {}
+    },
+    "OBV": {
+      "name": "OBV",
+      "summary": {
+        "total_return": -0.6413974041666807,
+        "sharpe_ratio": -0.5562899095522963,
+        "max_drawdown": -1.3436718666918424,
+        "win_rate": 50.0,
+        "profit_factor": 1.0,
+        "total_trades": 0,
+        "sample_size": 8
+      },
+      "ticker_performance": {
+        "2914": {
+          "total_return": 0.0,
+          "sharpe_ratio": -0.780418629712946,
+          "max_drawdown": -2.27181412267925,
+          "win_rate": 18.181818181818183,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 5.977681819714905,
+          "worst_trade": -6.278398041321139,
+          "avg_holding_period": 0.0
+        },
+        "3382": {
+          "total_return": 0.0,
+          "sharpe_ratio": 0.2996321367062756,
+          "max_drawdown": -1.6038634360616475,
+          "win_rate": 33.33333333333333,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 16.78834217742277,
+          "worst_trade": -5.550374896844858,
+          "avg_holding_period": 0.0
+        },
+        "4523": {
+          "total_return": 0.0,
+          "sharpe_ratio": -1.313496458847783,
+          "max_drawdown": -0.9720631922587986,
+          "win_rate": 12.5,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 0.8961005987747023,
+          "worst_trade": -4.732859516509862,
+          "avg_holding_period": 0.0
+        },
+        "8411": {
+          "total_return": 0.0,
+          "sharpe_ratio": -0.353298318728673,
+          "max_drawdown": -3.518794708748396,
+          "win_rate": 20.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 23.96066033367624,
+          "worst_trade": -7.643533245090582,
+          "avg_holding_period": 0.0
+        },
+        "9432": {
+          "total_return": 0.0,
+          "sharpe_ratio": -1.3111493952643734,
+          "max_drawdown": -1.4991652823300616,
+          "win_rate": 27.27272727272727,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 4.420615044726074,
+          "worst_trade": -3.5893543001736283,
+          "avg_holding_period": 0.0
+        },
+        "DIA": {
+          "total_return": 0.0,
+          "sharpe_ratio": 0.0525540282541379,
+          "max_drawdown": -1.1454357647738167,
+          "win_rate": 44.44444444444444,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 4.470886939302595,
+          "worst_trade": -3.1367505071395616,
+          "avg_holding_period": 0.0
+        },
+        "INTC": {
+          "total_return": 0.0,
+          "sharpe_ratio": -0.3081672064631914,
+          "max_drawdown": -1.98524353939733,
+          "win_rate": 20.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 9.21286032193044,
+          "worst_trade": -3.499963788834224,
+          "avg_holding_period": 0.0
+        },
+        "QCOM": {
+          "total_return": 0.0,
+          "sharpe_ratio": -0.8998094395841296,
+          "max_drawdown": -2.11995950468612,
+          "win_rate": 23.07692307692308,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 11.091170822423122,
+          "worst_trade": -7.576120975240041,
+          "avg_holding_period": 0.0
+        }
+      },
+      "rolling_performance": [],
+      "trade_analysis": {},
+      "risk_metrics": {
+        "volatility": 0.0,
+        "min_return": 0.0,
+        "max_return": 0.0,
+        "avg_return": 0.0,
+        "positive_count": 0,
+        "negative_count": 0,
+        "success_rate": 0.0
+      }
+    },
+    "RSIExtreme": {
+      "name": "RSIExtreme",
+      "summary": {
+        "total_return": 0.2181480049907209,
+        "sharpe_ratio": 0.7334880032706079,
+        "max_drawdown": -0.8729522263352152,
+        "win_rate": 50.0,
+        "profit_factor": 1.0,
+        "total_trades": 26,
+        "sample_size": 8
+      },
+      "ticker_performance": {},
+      "rolling_performance": [],
+      "trade_analysis": {},
+      "risk_metrics": {}
+    },
+    "RSIMomentum": {
+      "name": "RSIMomentum",
+      "summary": {
+        "total_return": -0.0623294060358603,
+        "sharpe_ratio": -0.083953661900722,
+        "max_drawdown": -1.1699142431352283,
+        "win_rate": 50.0,
+        "profit_factor": 1.0,
+        "total_trades": 0,
+        "sample_size": 8
+      },
+      "ticker_performance": {
+        "2914": {
+          "total_return": 0.0,
+          "sharpe_ratio": -1.255546125265707,
+          "max_drawdown": -2.8725456624602352,
+          "win_rate": 20.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 9.6715622334946,
+          "worst_trade": -6.367122803023214,
+          "avg_holding_period": 0.0
+        },
+        "3382": {
+          "total_return": 0.0,
+          "sharpe_ratio": 0.2239775614472313,
+          "max_drawdown": -1.7748579382827478,
+          "win_rate": 37.5,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 8.02090300286565,
+          "worst_trade": -5.958288937984891,
+          "avg_holding_period": 0.0
+        },
+        "4523": {
+          "total_return": 0.0,
+          "sharpe_ratio": 0.0192399878873421,
+          "max_drawdown": -0.8317764738543731,
+          "win_rate": 44.44444444444444,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 4.784414962697678,
+          "worst_trade": -3.586684646607759,
+          "avg_holding_period": 0.0
+        },
+        "8411": {
+          "total_return": 0.0,
+          "sharpe_ratio": 0.9306918727977352,
+          "max_drawdown": -0.8865835475694306,
+          "win_rate": 66.66666666666666,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 7.493785571177798,
+          "worst_trade": -7.952452292476905,
+          "avg_holding_period": 0.0
+        },
+        "9432": {
+          "total_return": 0.0,
+          "sharpe_ratio": -1.1220664788250234,
+          "max_drawdown": -2.0316145852102285,
+          "win_rate": 30.76923076923077,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 4.59673505786942,
+          "worst_trade": -3.589366788111356,
+          "avg_holding_period": 0.0
+        },
+        "DIA": {
+          "total_return": 0.0,
+          "sharpe_ratio": -0.5947440287493106,
+          "max_drawdown": -1.5011977617640504,
+          "win_rate": 45.83333333333333,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 6.3932680455344375,
+          "worst_trade": -6.418709516018008,
+          "avg_holding_period": 0.0
+        },
+        "INTC": {
+          "total_return": 0.0,
+          "sharpe_ratio": 0.0911390094037854,
+          "max_drawdown": -1.38989175005233,
+          "win_rate": 43.75,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 6.990597467224585,
+          "worst_trade": -5.647888355078445,
+          "avg_holding_period": 0.0
+        },
+        "QCOM": {
+          "total_return": 0.0,
+          "sharpe_ratio": 0.8033394439221322,
+          "max_drawdown": -1.1692518509479832,
+          "win_rate": 53.84615384615385,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 15.489259832527418,
+          "worst_trade": -4.193000389323374,
+          "avg_holding_period": 0.0
+        }
+      },
+      "rolling_performance": [],
+      "trade_analysis": {},
+      "risk_metrics": {
+        "volatility": 0.0,
+        "min_return": 0.0,
+        "max_return": 0.0,
+        "avg_return": 0.0,
+        "positive_count": 0,
+        "negative_count": 0,
+        "success_rate": 0.0
+      }
+    },
+    "SmaCross": {
+      "name": "SmaCross",
+      "summary": {
+        "total_return": 0.0,
+        "sharpe_ratio": -0.4174718262587009,
+        "max_drawdown": 0.0,
+        "win_rate": 50.0,
+        "profit_factor": 1.0,
+        "total_trades": 0,
+        "sample_size": 16
+      },
+      "ticker_performance": {
+        "2914": {
+          "total_return": 0.0,
+          "sharpe_ratio": -0.2783999149773395,
+          "max_drawdown": -15.476186342663611,
+          "win_rate": 75.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 4.356681609021481,
+          "worst_trade": -12.033152282280568,
+          "avg_holding_period": 0.0
+        },
+        "3382": {
+          "total_return": 0.0,
+          "sharpe_ratio": -0.9664351474122964,
+          "max_drawdown": -11.383040165889524,
+          "win_rate": 66.66666666666666,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 1.7074691082295566,
+          "worst_trade": -11.117975727427384,
+          "avg_holding_period": 0.0
+        },
+        "4523": {
+          "total_return": 0.0,
+          "sharpe_ratio": -1.9076434424424336,
+          "max_drawdown": -17.40970692601843,
+          "win_rate": 0.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": -5.162168285774984,
+          "worst_trade": -11.653423021638098,
+          "avg_holding_period": 0.0
+        },
+        "8411": {
+          "total_return": 0.0,
+          "sharpe_ratio": -0.6116142298870981,
+          "max_drawdown": -11.71386372520823,
+          "win_rate": 50.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 4.922679308313515,
+          "worst_trade": -9.803595700890115,
+          "avg_holding_period": 0.0
+        },
+        "9432": {
+          "total_return": 0.0,
+          "sharpe_ratio": 0.0100186654104974,
+          "max_drawdown": -5.613407966737338,
+          "win_rate": 40.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 1.6111078329184425,
+          "worst_trade": -1.604017921160579,
+          "avg_holding_period": 0.0
+        },
+        "DIA": {
+          "total_return": 0.0,
+          "sharpe_ratio": 0.6112325721869724,
+          "max_drawdown": -9.229877084661908,
+          "win_rate": 50.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 11.262580376114087,
+          "worst_trade": -3.4148343517756268,
+          "avg_holding_period": 0.0
+        },
+        "INTC": {
+          "total_return": 0.0,
+          "sharpe_ratio": -0.4292872606993141,
+          "max_drawdown": -10.238774915869309,
+          "win_rate": 33.33333333333333,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 3.799741432869361,
+          "worst_trade": -8.450585371463301,
+          "avg_holding_period": 0.0
+        },
+        "QCOM": {
+          "total_return": 0.0,
+          "sharpe_ratio": 1.1091462405183297,
+          "max_drawdown": -9.70672798032808,
+          "win_rate": 50.0,
+          "total_trades": 0,
+          "avg_trade_return": 0.0,
+          "best_trade": 29.548793508513636,
+          "worst_trade": -9.208348091497612,
+          "avg_holding_period": 0.0
+        }
+      },
+      "rolling_performance": [],
+      "trade_analysis": {},
+      "risk_metrics": {
+        "volatility": 0.0,
+        "min_return": 0.0,
+        "max_return": 0.0,
+        "avg_return": 0.0,
+        "positive_count": 0,
+        "negative_count": 0,
+        "success_rate": 0.0
+      }
+    },
+    "Squeeze": {
+      "name": "Squeeze",
+      "summary": {
+        "total_return": -0.3267945652622916,
+        "sharpe_ratio": 0.2180291475967186,
+        "max_drawdown": -1.0357335908888887,
+        "win_rate": 50.0,
+        "profit_factor": 1.0,
+        "total_trades": 26,
+        "sample_size": 8
+      },
+      "ticker_performance": {},
+      "rolling_performance": [],
+      "trade_analysis": {},
+      "risk_metrics": {}
+    },
+    "VolumeBreakout": {
+      "name": "VolumeBreakout",
+      "summary": {
+        "total_return": 0.8555973830960788,
+        "sharpe_ratio": 0.5828369881593765,
+        "max_drawdown": -0.1628183093882587,
+        "win_rate": 50.0,
+        "profit_factor": 1.0,
+        "total_trades": 15,
+        "sample_size": 8
+      },
+      "ticker_performance": {},
+      "rolling_performance": [],
+      "trade_analysis": {},
+      "risk_metrics": {}
+    }
+  },
+  "portfolio_metrics": {
+    "correlation_matrix": {
+      "BollingerBands": {
+        "BollingerBands": 1.0,
+        "DonchianChannel": 0.5,
+        "FixedSma": 0.5,
+        "MACD": 0.5,
+        "Momentum": 0.5,
+        "MovingAverageBreakout": 0.5,
+        "OBV": 0.5,
+        "RSIExtreme": 0.5,
+        "RSIMomentum": 0.5,
+        "SmaCross": 0.5,
+        "Squeeze": 0.5,
+        "VolumeBreakout": 0.5
+      },
+      "DonchianChannel": {
+        "BollingerBands": 0.5,
+        "DonchianChannel": 1.0,
+        "FixedSma": 0.5,
+        "MACD": 0.5,
+        "Momentum": 0.5,
+        "MovingAverageBreakout": 0.5,
+        "OBV": 0.5,
+        "RSIExtreme": 0.5,
+        "RSIMomentum": 0.5,
+        "SmaCross": 0.5,
+        "Squeeze": 0.5,
+        "VolumeBreakout": 0.5
+      },
+      "FixedSma": {
+        "BollingerBands": 0.5,
+        "DonchianChannel": 0.5,
+        "FixedSma": 1.0,
+        "MACD": 0.5,
+        "Momentum": 0.5,
+        "MovingAverageBreakout": 0.5,
+        "OBV": 0.5,
+        "RSIExtreme": 0.5,
+        "RSIMomentum": 0.5,
+        "SmaCross": 0.5,
+        "Squeeze": 0.5,
+        "VolumeBreakout": 0.5
+      },
+      "MACD": {
+        "BollingerBands": 0.5,
+        "DonchianChannel": 0.5,
+        "FixedSma": 0.5,
+        "MACD": 1.0,
+        "Momentum": 0.5,
+        "MovingAverageBreakout": 0.5,
+        "OBV": 0.5,
+        "RSIExtreme": 0.5,
+        "RSIMomentum": 0.5,
+        "SmaCross": 0.5,
+        "Squeeze": 0.5,
+        "VolumeBreakout": 0.5
+      },
+      "Momentum": {
+        "BollingerBands": 0.5,
+        "DonchianChannel": 0.5,
+        "FixedSma": 0.5,
+        "MACD": 0.5,
+        "Momentum": 1.0,
+        "MovingAverageBreakout": 0.5,
+        "OBV": 0.5,
+        "RSIExtreme": 0.5,
+        "RSIMomentum": 0.5,
+        "SmaCross": 0.5,
+        "Squeeze": 0.5,
+        "VolumeBreakout": 0.5
+      },
+      "MovingAverageBreakout": {
+        "BollingerBands": 0.5,
+        "DonchianChannel": 0.5,
+        "FixedSma": 0.5,
+        "MACD": 0.5,
+        "Momentum": 0.5,
+        "MovingAverageBreakout": 1.0,
+        "OBV": 0.5,
+        "RSIExtreme": 0.5,
+        "RSIMomentum": 0.5,
+        "SmaCross": 0.5,
+        "Squeeze": 0.5,
+        "VolumeBreakout": 0.5
+      },
+      "OBV": {
+        "BollingerBands": 0.5,
+        "DonchianChannel": 0.5,
+        "FixedSma": 0.5,
+        "MACD": 0.5,
+        "Momentum": 0.5,
+        "MovingAverageBreakout": 0.5,
+        "OBV": 1.0,
+        "RSIExtreme": 0.5,
+        "RSIMomentum": 0.5,
+        "SmaCross": 0.5,
+        "Squeeze": 0.5,
+        "VolumeBreakout": 0.5
+      },
+      "RSIExtreme": {
+        "BollingerBands": 0.5,
+        "DonchianChannel": 0.5,
+        "FixedSma": 0.5,
+        "MACD": 0.5,
+        "Momentum": 0.5,
+        "MovingAverageBreakout": 0.5,
+        "OBV": 0.5,
+        "RSIExtreme": 1.0,
+        "RSIMomentum": 0.5,
+        "SmaCross": 0.5,
+        "Squeeze": 0.5,
+        "VolumeBreakout": 0.5
+      },
+      "RSIMomentum": {
+        "BollingerBands": 0.5,
+        "DonchianChannel": 0.5,
+        "FixedSma": 0.5,
+        "MACD": 0.5,
+        "Momentum": 0.5,
+        "MovingAverageBreakout": 0.5,
+        "OBV": 0.5,
+        "RSIExtreme": 0.5,
+        "RSIMomentum": 1.0,
+        "SmaCross": 0.5,
+        "Squeeze": 0.5,
+        "VolumeBreakout": 0.5
+      },
+      "SmaCross": {
+        "BollingerBands": 0.5,
+        "DonchianChannel": 0.5,
+        "FixedSma": 0.5,
+        "MACD": 0.5,
+        "Momentum": 0.5,
+        "MovingAverageBreakout": 0.5,
+        "OBV": 0.5,
+        "RSIExtreme": 0.5,
+        "RSIMomentum": 0.5,
+        "SmaCross": 1.0,
+        "Squeeze": 0.5,
+        "VolumeBreakout": 0.5
+      },
+      "Squeeze": {
+        "BollingerBands": 0.5,
+        "DonchianChannel": 0.5,
+        "FixedSma": 0.5,
+        "MACD": 0.5,
+        "Momentum": 0.5,
+        "MovingAverageBreakout": 0.5,
+        "OBV": 0.5,
+        "RSIExtreme": 0.5,
+        "RSIMomentum": 0.5,
+        "SmaCross": 0.5,
+        "Squeeze": 1.0,
+        "VolumeBreakout": 0.5
+      },
+      "VolumeBreakout": {
+        "BollingerBands": 0.5,
+        "DonchianChannel": 0.5,
+        "FixedSma": 0.5,
+        "MACD": 0.5,
+        "Momentum": 0.5,
+        "MovingAverageBreakout": 0.5,
+        "OBV": 0.5,
+        "RSIExtreme": 0.5,
+        "RSIMomentum": 0.5,
+        "SmaCross": 0.5,
+        "Squeeze": 0.5,
+        "VolumeBreakout": 1.0
+      }
+    },
+    "portfolio_return": -1.0720823834048383,
+    "portfolio_volatility": 2.88040726808497,
+    "portfolio_sharpe": -0.37219819408302246,
+    "strategy_count": 12,
+    "diversification_score": -2.3665452057156613
+  },
+  "strategy_rankings": [
+    {
+      "name": "VolumeBreakout",
+      "total_return": 0.8555973830960788,
+      "sharpe_ratio": 0.5828369881593765,
+      "max_drawdown": -0.1628183093882587,
+      "win_rate": 50.0,
+      "total_trades": 0,
+      "sample_size": 8
+    },
+    {
+      "name": "Momentum",
+      "total_return": 0.3695393618568565,
+      "sharpe_ratio": 1.1275318518418052,
+      "max_drawdown": -2.8455484700248355,
+      "win_rate": 50.0,
+      "total_trades": 0,
+      "sample_size": 8
+    },
+    {
+      "name": "MACD",
+      "total_return": 0.3183563478607248,
+      "sharpe_ratio": 0.2745387908158546,
+      "max_drawdown": -0.8452771330527575,
+      "win_rate": 50.0,
+      "total_trades": 0,
+      "sample_size": 8
+    },
+    {
+      "name": "RSIExtreme",
+      "total_return": 0.2181480049907209,
+      "sharpe_ratio": 0.7334880032706079,
+      "max_drawdown": -0.8729522263352152,
+      "win_rate": 50.0,
+      "total_trades": 0,
+      "sample_size": 8
+    },
+    {
+      "name": "SmaCross",
+      "total_return": 0.0,
+      "sharpe_ratio": -0.4174718262587009,
+      "max_drawdown": 0.0,
+      "win_rate": 50.0,
+      "total_trades": 0,
+      "sample_size": 16
+    },
+    {
+      "name": "RSIMomentum",
+      "total_return": -0.0623294060358603,
+      "sharpe_ratio": -0.083953661900722,
+      "max_drawdown": -1.1699142431352283,
+      "win_rate": 50.0,
+      "total_trades": 0,
+      "sample_size": 8
+    },
+    {
+      "name": "BollingerBands",
+      "total_return": -0.0707748631532158,
+      "sharpe_ratio": -0.1450085198514009,
+      "max_drawdown": -0.6673539079502522,
+      "win_rate": 50.0,
+      "total_trades": 0,
+      "sample_size": 8
+    },
+    {
+      "name": "Squeeze",
+      "total_return": -0.3267945652622916,
+      "sharpe_ratio": 0.2180291475967186,
+      "max_drawdown": -1.0357335908888887,
+      "win_rate": 50.0,
+      "total_trades": 0,
+      "sample_size": 8
+    },
+    {
+      "name": "OBV",
+      "total_return": -0.6413974041666807,
+      "sharpe_ratio": -0.5562899095522963,
+      "max_drawdown": -1.3436718666918424,
+      "win_rate": 50.0,
+      "total_trades": 0,
+      "sample_size": 8
+    },
+    {
+      "name": "DonchianChannel",
+      "total_return": -1.5043182590860165,
+      "sharpe_ratio": 0.0977414971590064,
+      "max_drawdown": -0.1637779445393437,
+      "win_rate": 50.0,
+      "total_trades": 0,
+      "sample_size": 8
+    },
+    {
+      "name": "MovingAverageBreakout",
+      "total_return": -1.6923321492976378,
+      "sharpe_ratio": 0.2447456326134125,
+      "max_drawdown": -0.9549864222457938,
+      "win_rate": 50.0,
+      "total_trades": 0,
+      "sample_size": 8
+    },
+    {
+      "name": "FixedSma",
+      "total_return": -10.328683051660736,
+      "sharpe_ratio": -0.8232025382648496,
+      "max_drawdown": -18.46214101474883,
+      "win_rate": 50.0,
+      "total_trades": 0,
+      "sample_size": 16
+    }
+  ],
+  "heatmap_data": [
+    {
+      "strategy": "BollingerBands",
+      "ticker": "2914",
+      "return": 0.0,
+      "sharpe": 0.0984933186719767,
+      "drawdown": -0.3221368625721754
+    },
+    {
+      "strategy": "BollingerBands",
+      "ticker": "3382",
+      "return": 0.0,
+      "sharpe": -0.597481550917177,
+      "drawdown": -0.7777413850241444
+    },
+    {
+      "strategy": "BollingerBands",
+      "ticker": "4523",
+      "return": 0.0,
+      "sharpe": -2.017608678867554,
+      "drawdown": -1.7937034863837351
+    },
+    {
+      "strategy": "BollingerBands",
+      "ticker": "8411",
+      "return": 0.0,
+      "sharpe": 0.6879107946526429,
+      "drawdown": -0.8519358138454614
+    },
+    {
+      "strategy": "BollingerBands",
+      "ticker": "9432",
+      "return": 0.0,
+      "sharpe": 0.8046713740728363,
+      "drawdown": -0.1997097815487181
+    },
+    {
+      "strategy": "BollingerBands",
+      "ticker": "DIA",
+      "return": 0.0,
+      "sharpe": -0.3898859547443654,
+      "drawdown": -1.2261500879434897
+    },
+    {
+      "strategy": "BollingerBands",
+      "ticker": "INTC",
+      "return": 0.0,
+      "sharpe": -0.3854099657667807,
+      "drawdown": -1.1038058544520557
+    },
+    {
+      "strategy": "BollingerBands",
+      "ticker": "QCOM",
+      "return": 0.0,
+      "sharpe": -1.5010705131186752,
+      "drawdown": -1.8625861877130776
+    },
+    {
+      "strategy": "FixedSma",
+      "ticker": "2914",
+      "return": 0.0,
+      "sharpe": -0.278973427704633,
+      "drawdown": -1.733171269444156
+    },
+    {
+      "strategy": "FixedSma",
+      "ticker": "3382",
+      "return": 0.0,
+      "sharpe": 0.1731633705973526,
+      "drawdown": -2.559881581043899
+    },
+    {
+      "strategy": "FixedSma",
+      "ticker": "4523",
+      "return": 0.0,
+      "sharpe": 0.468564702934194,
+      "drawdown": -0.6700990237176185
+    },
+    {
+      "strategy": "FixedSma",
+      "ticker": "8411",
+      "return": 0.0,
+      "sharpe": 0.6117131874884264,
+      "drawdown": -2.487492927442747
+    },
+    {
+      "strategy": "FixedSma",
+      "ticker": "9432",
+      "return": 0.0,
+      "sharpe": -2.3181985045058395,
+      "drawdown": -2.534815314428618
+    },
+    {
+      "strategy": "FixedSma",
+      "ticker": "DIA",
+      "return": 0.0,
+      "sharpe": 1.2814921257437126,
+      "drawdown": -0.6629729316394717
+    },
+    {
+      "strategy": "FixedSma",
+      "ticker": "INTC",
+      "return": 0.0,
+      "sharpe": 0.7506713997635517,
+      "drawdown": -1.9736022187176627
+    },
+    {
+      "strategy": "FixedSma",
+      "ticker": "QCOM",
+      "return": 0.0,
+      "sharpe": 0.631827666175264,
+      "drawdown": -1.671406233075079
+    },
+    {
+      "strategy": "MACD",
+      "ticker": "2914",
+      "return": 0.0,
+      "sharpe": -0.9893688224476204,
+      "drawdown": -0.1736865343940574
+    },
+    {
+      "strategy": "MACD",
+      "ticker": "3382",
+      "return": 0.0,
+      "sharpe": 0.1057993495802029,
+      "drawdown": -2.192978664573897
+    },
+    {
+      "strategy": "MACD",
+      "ticker": "4523",
+      "return": 0.0,
+      "sharpe": -0.9836640966478684,
+      "drawdown": -0.3148166927204987
+    },
+    {
+      "strategy": "MACD",
+      "ticker": "8411",
+      "return": 0.0,
+      "sharpe": NaN,
+      "drawdown": -0.0
+    },
+    {
+      "strategy": "MACD",
+      "ticker": "9432",
+      "return": 0.0,
+      "sharpe": -0.1305797019053234,
+      "drawdown": -0.8886976273116742
+    },
+    {
+      "strategy": "MACD",
+      "ticker": "DIA",
+      "return": 0.0,
+      "sharpe": -0.901518141178852,
+      "drawdown": -1.5496455010151289
+    },
+    {
+      "strategy": "MACD",
+      "ticker": "INTC",
+      "return": 0.0,
+      "sharpe": -0.544089236891568,
+      "drawdown": -1.6431193939654751
+    },
+    {
+      "strategy": "MACD",
+      "ticker": "QCOM",
+      "return": 0.0,
+      "sharpe": 0.5736939555673768,
+      "drawdown": -0.4060637626737473
+    },
+    {
+      "strategy": "OBV",
+      "ticker": "2914",
+      "return": 0.0,
+      "sharpe": -0.780418629712946,
+      "drawdown": -2.27181412267925
+    },
+    {
+      "strategy": "OBV",
+      "ticker": "3382",
+      "return": 0.0,
+      "sharpe": 0.2996321367062756,
+      "drawdown": -1.6038634360616475
+    },
+    {
+      "strategy": "OBV",
+      "ticker": "4523",
+      "return": 0.0,
+      "sharpe": -1.313496458847783,
+      "drawdown": -0.9720631922587986
+    },
+    {
+      "strategy": "OBV",
+      "ticker": "8411",
+      "return": 0.0,
+      "sharpe": -0.353298318728673,
+      "drawdown": -3.518794708748396
+    },
+    {
+      "strategy": "OBV",
+      "ticker": "9432",
+      "return": 0.0,
+      "sharpe": -1.3111493952643734,
+      "drawdown": -1.4991652823300616
+    },
+    {
+      "strategy": "OBV",
+      "ticker": "DIA",
+      "return": 0.0,
+      "sharpe": 0.0525540282541379,
+      "drawdown": -1.1454357647738167
+    },
+    {
+      "strategy": "OBV",
+      "ticker": "INTC",
+      "return": 0.0,
+      "sharpe": -0.3081672064631914,
+      "drawdown": -1.98524353939733
+    },
+    {
+      "strategy": "OBV",
+      "ticker": "QCOM",
+      "return": 0.0,
+      "sharpe": -0.8998094395841296,
+      "drawdown": -2.11995950468612
+    },
+    {
+      "strategy": "RSIMomentum",
+      "ticker": "2914",
+      "return": 0.0,
+      "sharpe": -1.255546125265707,
+      "drawdown": -2.8725456624602352
+    },
+    {
+      "strategy": "RSIMomentum",
+      "ticker": "3382",
+      "return": 0.0,
+      "sharpe": 0.2239775614472313,
+      "drawdown": -1.7748579382827478
+    },
+    {
+      "strategy": "RSIMomentum",
+      "ticker": "4523",
+      "return": 0.0,
+      "sharpe": 0.0192399878873421,
+      "drawdown": -0.8317764738543731
+    },
+    {
+      "strategy": "RSIMomentum",
+      "ticker": "8411",
+      "return": 0.0,
+      "sharpe": 0.9306918727977352,
+      "drawdown": -0.8865835475694306
+    },
+    {
+      "strategy": "RSIMomentum",
+      "ticker": "9432",
+      "return": 0.0,
+      "sharpe": -1.1220664788250234,
+      "drawdown": -2.0316145852102285
+    },
+    {
+      "strategy": "RSIMomentum",
+      "ticker": "DIA",
+      "return": 0.0,
+      "sharpe": -0.5947440287493106,
+      "drawdown": -1.5011977617640504
+    },
+    {
+      "strategy": "RSIMomentum",
+      "ticker": "INTC",
+      "return": 0.0,
+      "sharpe": 0.0911390094037854,
+      "drawdown": -1.38989175005233
+    },
+    {
+      "strategy": "RSIMomentum",
+      "ticker": "QCOM",
+      "return": 0.0,
+      "sharpe": 0.8033394439221322,
+      "drawdown": -1.1692518509479832
+    },
+    {
+      "strategy": "SmaCross",
+      "ticker": "2914",
+      "return": 0.0,
+      "sharpe": -0.2783999149773395,
+      "drawdown": -15.476186342663611
+    },
+    {
+      "strategy": "SmaCross",
+      "ticker": "3382",
+      "return": 0.0,
+      "sharpe": -0.9664351474122964,
+      "drawdown": -11.383040165889524
+    },
+    {
+      "strategy": "SmaCross",
+      "ticker": "4523",
+      "return": 0.0,
+      "sharpe": -1.9076434424424336,
+      "drawdown": -17.40970692601843
+    },
+    {
+      "strategy": "SmaCross",
+      "ticker": "8411",
+      "return": 0.0,
+      "sharpe": -0.6116142298870981,
+      "drawdown": -11.71386372520823
+    },
+    {
+      "strategy": "SmaCross",
+      "ticker": "9432",
+      "return": 0.0,
+      "sharpe": 0.0100186654104974,
+      "drawdown": -5.613407966737338
+    },
+    {
+      "strategy": "SmaCross",
+      "ticker": "DIA",
+      "return": 0.0,
+      "sharpe": 0.6112325721869724,
+      "drawdown": -9.229877084661908
+    },
+    {
+      "strategy": "SmaCross",
+      "ticker": "INTC",
+      "return": 0.0,
+      "sharpe": -0.4292872606993141,
+      "drawdown": -10.238774915869309
+    },
+    {
+      "strategy": "SmaCross",
+      "ticker": "QCOM",
+      "return": 0.0,
+      "sharpe": 1.1091462405183297,
+      "drawdown": -9.70672798032808
+    }
+  ],
+  "summary_stats": {
+    "total_strategies": 12,
+    "active_strategies": 12,
+    "total_tickers": 8,
+    "total_trades": 0,
+    "avg_return": -1.072082383404838,
+    "best_strategy": "VolumeBreakout",
+    "worst_strategy": "FixedSma"
+  }
+}

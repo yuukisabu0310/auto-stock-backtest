@@ -1,0 +1,8 @@
+Strategy: MACD
+Timestamp: 2025-08-14 22:18:06
+
+Parameters:
+macd_fast = 12
+macd_slow = 26
+macd_signal = 9
+volume_multiplier = 1.0

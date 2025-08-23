@@ -1,0 +1,5 @@
+Strategy: OBV
+Timestamp: 2025-08-14 20:21:06
+
+Parameters:
+obv_period = 20

@@ -71,6 +71,12 @@ def generate_enhanced_dashboard():
         all_tickers.update(strategy_data.get('ticker_performance', {}).keys())
     ticker_list = sorted(list(all_tickers))
     
+    # ポートフォリオ指標の値を取得
+    portfolio_return = portfolio_metrics.get('portfolio_return', 0)
+    portfolio_volatility = portfolio_metrics.get('portfolio_volatility', 0)
+    portfolio_sharpe = portfolio_metrics.get('portfolio_sharpe', 0)
+    diversification_score = portfolio_metrics.get('diversification_score', 0)
+    
     # HTMLテンプレート
     html_template = f"""
 <!DOCTYPE html>
@@ -572,7 +578,7 @@ def generate_enhanced_dashboard():
                         <div class="section">
                             <h2>📈 戦略パフォーマンス詳細</h2>
                             <div class="strategy-grid">
-    """
+"""
     
     # 戦略カードを生成
     for i, ranking in enumerate(strategy_rankings[:10]):  # 上位10戦略のみ表示
@@ -649,7 +655,7 @@ def generate_enhanced_dashboard():
                                         </div>
                                     </div>
                                 </div>
-        """
+"""
     
     html_template += """
                             </div>
@@ -661,7 +667,7 @@ def generate_enhanced_dashboard():
                             <h2>🔥 戦略×銘柄ヒートマップ</h2>
                             <div class="heatmap-container">
                                 <div class="heatmap-grid">
-    """
+"""
     
     # ヒートマップを生成（上位20件のみ）
     for item in heatmap_data[:20]:
@@ -672,7 +678,7 @@ def generate_enhanced_dashboard():
                                         <div style="font-size: 0.7em;">{item['ticker']}</div>
                                         <div style="font-size: 0.9em; margin-top: 5px;">{format_number(item['return'])}%</div>
                                     </div>
-        """
+"""
     
     html_template += """
                                 </div>
@@ -695,7 +701,7 @@ def generate_enhanced_dashboard():
                 <div class="section">
                     <h2>🏆 戦略ランキング</h2>
                     <ul class="ranking-list">
-    """
+"""
     
     # ランキングリストを生成
     for i, ranking in enumerate(strategy_rankings[:10]):
@@ -711,9 +717,9 @@ def generate_enhanced_dashboard():
                                 </div>
                             </div>
                         </li>
-        """
+"""
     
-    html_template += """
+    html_template += f"""
                     </ul>
                 </div>
                 
@@ -728,7 +734,7 @@ def generate_enhanced_dashboard():
                                     <span class="tooltiptext">全戦略を組み合わせた場合の平均リターン。分散投資の効果を示します。</span>
                                 </span>
                             </div>
-                            <div class="metric-value {get_color_class(portfolio_metrics.get('portfolio_return', 0), 'return')}">{format_number(portfolio_metrics.get('portfolio_return', 0))}%</div>
+                            <div class="metric-value {get_color_class(portfolio_return, 'return')}">{format_number(portfolio_return)}%</div>
                         </div>
                         <div class="metric-item">
                             <div class="metric-label">
@@ -738,7 +744,7 @@ def generate_enhanced_dashboard():
                                     <span class="tooltiptext">全戦略を組み合わせた場合のリスク（変動性）。低いほど安定です。</span>
                                 </span>
                             </div>
-                            <div class="metric-value neutral">{format_number(portfolio_metrics.get('portfolio_volatility', 0))}%</div>
+                            <div class="metric-value neutral">{format_number(portfolio_volatility)}%</div>
                         </div>
                         <div class="metric-item">
                             <div class="metric-label">
@@ -748,7 +754,7 @@ def generate_enhanced_dashboard():
                                     <span class="tooltiptext">ポートフォリオ全体のリスク調整後収益率。1.0以上が良好です。</span>
                                 </span>
                             </div>
-                            <div class="metric-value {get_color_class(portfolio_metrics.get('portfolio_sharpe', 0), 'sharpe')}">{format_number(portfolio_metrics.get('portfolio_sharpe', 0))}</div>
+                            <div class="metric-value {get_color_class(portfolio_sharpe, 'sharpe')}">{format_number(portfolio_sharpe)}</div>
                         </div>
                         <div class="metric-item">
                             <div class="metric-label">
@@ -758,7 +764,7 @@ def generate_enhanced_dashboard():
                                     <span class="tooltiptext">戦略間の相関が低いほど高くなるスコア。高いほど分散効果が期待できます。</span>
                                 </span>
                             </div>
-                            <div class="metric-value {get_color_class(portfolio_metrics.get('diversification_score', 0), 'return')}">{format_number(portfolio_metrics.get('diversification_score', 0))}</div>
+                            <div class="metric-value {get_color_class(diversification_score, 'return')}">{format_number(diversification_score)}</div>
                         </div>
                     </div>
                 </div>
@@ -768,13 +774,13 @@ def generate_enhanced_dashboard():
                     <div class="ticker-list">
                         <h4>テスト対象銘柄 ({len(ticker_list)}銘柄)</h4>
                         <div class="ticker-grid">
-    """
+"""
     
     # 銘柄リストを生成
     for ticker in ticker_list:
         html_template += f"""
                             <div class="ticker-item">{ticker}</div>
-        """
+"""
     
     html_template += """
                         </div>
@@ -856,7 +862,7 @@ def generate_enhanced_dashboard():
     </script>
 </body>
 </html>
-    """
+"""
     
     # HTMLファイルを保存
     output_file = ROOT / "enhanced_index.html"
