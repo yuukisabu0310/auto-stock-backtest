@@ -53,9 +53,25 @@ jobs:
 
       # 6. スマホ向け index.html を生成 
       - name: Build mobile index (reports/index.html)
-        run: python -m scripts.make_index
+        run: |
+          python -m scripts.make_index
+          echo "=== Reports directory contents ==="
+          ls -la reports/
+          echo "=== Checking if index.html exists ==="
+          if [ -f "reports/index.html" ]; then
+            echo "✅ index.html exists"
+            ls -la reports/index.html
+          else
+            echo "❌ index.html not found"
+          fi
 
       # 7. Pages 公開用アーティファクト作成
+      - name: Check reports before upload
+        run: |
+          echo "=== Final check before upload ==="
+          ls -la reports/
+          echo "=== Uploading to Pages artifact ==="
+      
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
