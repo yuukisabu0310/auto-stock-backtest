@@ -75,12 +75,4 @@ jobs:
           SLACK_MESSAGE:    "Backtest finished (JST)."
         run: python -m scripts.notify_slack
 
-      # 10. レポートをArtifactsとしても保存（バックアップ用）
-      - name: Upload reports as artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: backtest-reports
-          path: |
-            reports/index.html
-            reports/files.html
+
