@@ -1,6 +1,9 @@
 # Reports folder - バックテスト結果（自動生成されるため除外）
 reports/
 
+# Test folder - テスト関連ファイル（除外）
+test/
+
 # Python
 __pycache__/
 *.py[cod]
