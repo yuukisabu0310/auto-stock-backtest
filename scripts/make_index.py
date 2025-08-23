@@ -599,6 +599,21 @@ def build():
     
     # 従来のファイルリストも生成（後方互換性のため）
     generate_file_list()
+    
+    # 新しいダッシュボードも生成
+    try:
+        from enhanced_dashboard import generate_enhanced_dashboard_data
+        from create_enhanced_dashboard import generate_enhanced_dashboard
+        
+        print("Generating enhanced dashboard data...")
+        generate_enhanced_dashboard_data()
+        
+        print("Generating enhanced dashboard HTML...")
+        generate_enhanced_dashboard()
+        
+        print("reports/enhanced_index.html generated (Enhanced Dashboard)")
+    except Exception as e:
+        print(f"Enhanced dashboard generation failed: {e}")
 
 def generate_file_list():
     """従来のファイルリストを生成"""
