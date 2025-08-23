@@ -1,5 +1,5 @@
-# Reports folder - バックテスト結果（自動生成されるため除外）
-reports/
+# Reports folder - バックテスト結果（GitHub Pages用に含める）
+# reports/
 
 # Test folder - テスト関連ファイル（除外）
 test/
