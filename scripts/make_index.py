@@ -19,7 +19,7 @@ def build():
         sys.path.insert(0, scripts_dir)
         
         from enhanced_dashboard import generate_enhanced_dashboard_data
-        from create_enhanced_dashboard import generate_enhanced_dashboard
+        from create_enhanced_dashboard_fixed import generate_enhanced_dashboard
         
         print("Generating enhanced dashboard data...")
         generate_enhanced_dashboard_data()

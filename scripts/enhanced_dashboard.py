@@ -55,17 +55,23 @@ def load_strategy_data(strategy_name: str) -> Dict[str, Any]:
             df = pd.read_csv(csv_file)
             
             if not df.empty:
+                # より正確なデータ抽出
+                total_return = float(df.get('Total Return [%]', [0]).iloc[0]) if 'Total Return [%]' in df.columns else 0.0
+                sharpe_ratio = float(df.get('Sharpe Ratio', [0]).iloc[0]) if 'Sharpe Ratio' in df.columns else 0.0
+                max_drawdown = float(df.get('Max. Drawdown [%]', [0]).iloc[0]) if 'Max. Drawdown [%]' in df.columns else 0.0
+                win_rate = float(df.get('Win Rate [%]', [50]).iloc[0]) if 'Win Rate [%]' in df.columns else 50.0
+                total_trades = int(df.get('Total Trades', [0]).iloc[0]) if 'Total Trades' in df.columns else 0
+                
                 ticker_data[ticker] = {
-                    'total_return': float(df.get('Total Return [%]', [0]).mean()) if 'Total Return [%]' in df.columns else 0.0,
-                    'sharpe_ratio': float(df.get('Sharpe Ratio', [0]).mean()) if 'Sharpe Ratio' in df.columns else 0.0,
-                    'max_drawdown': float(df.get('Max. Drawdown [%]', [0]).mean()) if 'Max. Drawdown [%]' in df.columns else 0.0,
-                    'win_rate': float(df.get('Win Rate [%]', [50]).mean()) if 'Win Rate [%]' in df.columns else 50.0,
-                    'profit_factor': float(df.get('Profit Factor', [1.0]).mean()) if 'Profit Factor' in df.columns else 1.0,
-                    'total_trades': int(df.get('Total Trades', [0]).sum()) if 'Total Trades' in df.columns else 0,
-                    'avg_trade_return': float(df.get('Avg. Trade Return [%]', [0]).mean()) if 'Avg. Trade Return [%]' in df.columns else 0.0,
-                    'best_trade': float(df.get('Best Trade [%]', [0]).max()) if 'Best Trade [%]' in df.columns else 0.0,
-                    'worst_trade': float(df.get('Worst Trade [%]', [0]).min()) if 'Worst Trade [%]' in df.columns else 0.0,
-                    'avg_holding_period': float(df.get('Avg. Holding Period', [0]).mean()) if 'Avg. Holding Period' in df.columns else 0.0
+                    'total_return': total_return,
+                    'sharpe_ratio': sharpe_ratio,
+                    'max_drawdown': max_drawdown,
+                    'win_rate': win_rate,
+                    'total_trades': total_trades,
+                    'avg_trade_return': float(df.get('Avg. Trade Return [%]', [0]).iloc[0]) if 'Avg. Trade Return [%]' in df.columns else 0.0,
+                    'best_trade': float(df.get('Best Trade [%]', [0]).iloc[0]) if 'Best Trade [%]' in df.columns else 0.0,
+                    'worst_trade': float(df.get('Worst Trade [%]', [0]).iloc[0]) if 'Worst Trade [%]' in df.columns else 0.0,
+                    'avg_holding_period': float(df.get('Avg. Holding Period', [0]).iloc[0]) if 'Avg. Holding Period' in df.columns else 0.0
                 }
         except Exception as e:
             print(f"Error loading {csv_file}: {e}")
@@ -150,13 +156,16 @@ def generate_enhanced_dashboard_data():
     for strategy_name, data in strategies_data.items():
         if 'summary' in data:
             summary = data['summary']
+            # 個別銘柄のトレード数を合計
+            ticker_trades = sum([t.get('total_trades', 0) for t in data.get('ticker_performance', {}).values()])
+            
             strategy_rankings.append({
                 'name': strategy_name,
                 'total_return': summary.get('total_return', 0),
                 'sharpe_ratio': summary.get('sharpe_ratio', 0),
                 'max_drawdown': summary.get('max_drawdown', 0),
                 'win_rate': summary.get('win_rate', 0),
-                'total_trades': summary.get('total_trades', 0),
+                'total_trades': ticker_trades,  # 個別銘柄の合計
                 'sample_size': summary.get('sample_size', 0)
             })
     
