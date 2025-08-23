@@ -156,7 +156,6 @@ def generate_enhanced_dashboard_data():
                 'sharpe_ratio': summary.get('sharpe_ratio', 0),
                 'max_drawdown': summary.get('max_drawdown', 0),
                 'win_rate': summary.get('win_rate', 0),
-                'profit_factor': summary.get('profit_factor', 0),
                 'total_trades': summary.get('total_trades', 0),
                 'sample_size': summary.get('sample_size', 0)
             })
@@ -176,6 +175,18 @@ def generate_enhanced_dashboard_data():
                 'drawdown': performance.get('max_drawdown', 0)
             })
     
+    # 全戦略のリストを取得（設定ファイルから）
+    all_strategies = [
+        'FixedSma', 'SmaCross', 'MovingAverageBreakout', 'DonchianChannel', 
+        'MACD', 'RSIMomentum', 'RSIExtreme', 'BollingerBands', 
+        'Squeeze', 'VolumeBreakout', 'OBV', 'TrendFollowing'
+    ]
+    
+    # 実際にデータがある戦略と全戦略を区別
+    active_strategies = list(strategies_data.keys())
+    total_tickers = len(set([h['ticker'] for h in heatmap_data]))
+    total_trades = sum([s.get('total_trades', 0) for s in strategy_rankings])
+    
     # 最終的なデータ構造
     dashboard_data = {
         'generated_at': datetime.now().isoformat(),
@@ -184,8 +195,10 @@ def generate_enhanced_dashboard_data():
         'strategy_rankings': strategy_rankings,
         'heatmap_data': heatmap_data,
         'summary_stats': {
-            'total_strategies': len(strategies_data),
-            'total_tickers': len(set([h['ticker'] for h in heatmap_data])),
+            'total_strategies': len(all_strategies),  # 全戦略数
+            'active_strategies': len(active_strategies),  # アクティブな戦略数
+            'total_tickers': total_tickers,
+            'total_trades': total_trades,
             'avg_return': float(np.mean([s['total_return'] for s in strategy_rankings])) if strategy_rankings else 0.0,
             'best_strategy': strategy_rankings[0]['name'] if strategy_rankings else None,
             'worst_strategy': strategy_rankings[-1]['name'] if strategy_rankings else None

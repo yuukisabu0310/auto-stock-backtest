@@ -275,6 +275,57 @@ def generate_enhanced_dashboard():
             font-size: 1.2em;
         }}
         
+        .metric-item {{
+            position: relative;
+        }}
+        
+        .tooltip {{
+            position: relative;
+            display: inline-block;
+        }}
+        
+        .tooltip .tooltiptext {{
+            visibility: hidden;
+            width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8em;
+            line-height: 1.4;
+        }}
+        
+        .tooltip:hover .tooltiptext {{
+            visibility: visible;
+            opacity: 1;
+        }}
+        
+        .tooltip .tooltiptext::after {{
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }}
+        
+        .help-icon {{
+            color: #667eea;
+            cursor: help;
+            margin-left: 5px;
+            font-size: 0.8em;
+        }}
+        
         .heatmap-container {{
             background: white;
             border-radius: 15px;
@@ -455,7 +506,7 @@ def generate_enhanced_dashboard():
             <div class="stat-card">
                 <h3>📊 総戦略数</h3>
                 <div class="stat-value neutral">{summary_stats.get('total_strategies', 0)}</div>
-                <div class="stat-label">アクティブな戦略</div>
+                <div class="stat-label">全戦略数（アクティブ: {summary_stats.get('active_strategies', 0)}）</div>
             </div>
             <div class="stat-card">
                 <h3>📈 平均リターン</h3>
@@ -503,28 +554,64 @@ def generate_enhanced_dashboard():
                                     </h3>
                                     <div class="metrics-grid">
                                         <div class="metric-item">
-                                            <div class="metric-label">総リターン</div>
+                                            <div class="metric-label">
+                                                総リターン
+                                                <span class="tooltip">
+                                                    <span class="help-icon">?</span>
+                                                    <span class="tooltiptext">期間中の総収益率。プラスは利益、マイナスは損失を示します。</span>
+                                                </span>
+                                            </div>
                                             <div class="metric-value {get_color_class(ranking['total_return'], 'return')}">{format_number(ranking['total_return'])}%</div>
                                         </div>
                                         <div class="metric-item">
-                                            <div class="metric-label">シャープレシオ</div>
+                                            <div class="metric-label">
+                                                シャープレシオ
+                                                <span class="tooltip">
+                                                    <span class="help-icon">?</span>
+                                                    <span class="tooltiptext">リスク調整後収益率。1.0以上が良好、2.0以上が優秀とされます。</span>
+                                                </span>
+                                            </div>
                                             <div class="metric-value {get_color_class(ranking['sharpe_ratio'], 'sharpe')}">{format_number(ranking['sharpe_ratio'])}</div>
                                         </div>
                                         <div class="metric-item">
-                                            <div class="metric-label">最大DD</div>
+                                            <div class="metric-label">
+                                                最大DD
+                                                <span class="tooltip">
+                                                    <span class="help-icon">?</span>
+                                                    <span class="tooltiptext">最大ドローダウン。ピークから最大の下落幅を示します。</span>
+                                                </span>
+                                            </div>
                                             <div class="metric-value {get_color_class(ranking['max_drawdown'], 'drawdown')}">{format_number(ranking['max_drawdown'])}%</div>
                                         </div>
                                         <div class="metric-item">
-                                            <div class="metric-label">勝率</div>
+                                            <div class="metric-label">
+                                                勝率
+                                                <span class="tooltip">
+                                                    <span class="help-icon">?</span>
+                                                    <span class="tooltiptext">利益が出たトレードの割合。50%以上が良好とされます。</span>
+                                                </span>
+                                            </div>
                                             <div class="metric-value {get_color_class(ranking['win_rate'] - 50, 'return')}">{format_number(ranking['win_rate'])}%</div>
                                         </div>
                                         <div class="metric-item">
-                                            <div class="metric-label">プロフィットファクター</div>
-                                            <div class="metric-value {get_color_class(ranking['profit_factor'] - 1, 'return')}">{format_number(ranking['profit_factor'])}</div>
+                                            <div class="metric-label">
+                                                トレード数
+                                                <span class="tooltip">
+                                                    <span class="help-icon">?</span>
+                                                    <span class="tooltiptext">期間中に実行された総トレード数。サンプルサイズの指標です。</span>
+                                                </span>
+                                            </div>
+                                            <div class="metric-value neutral">{ranking['total_trades']}</div>
                                         </div>
                                         <div class="metric-item">
-                                            <div class="metric-label">トレード数</div>
-                                            <div class="metric-value neutral">{ranking['total_trades']}</div>
+                                            <div class="metric-label">
+                                                サンプル数
+                                                <span class="tooltip">
+                                                    <span class="help-icon">?</span>
+                                                    <span class="tooltiptext">テスト対象の銘柄数。統計的信頼性の指標です。</span>
+                                                </span>
+                                            </div>
+                                            <div class="metric-value neutral">{ranking['sample_size']}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -600,19 +687,43 @@ def generate_enhanced_dashboard():
                     <h2>📈 ポートフォリオ指標</h2>
                     <div class="metrics-grid">
                         <div class="metric-item">
-                            <div class="metric-label">ポートフォリオリターン</div>
+                            <div class="metric-label">
+                                ポートフォリオリターン
+                                <span class="tooltip">
+                                    <span class="help-icon">?</span>
+                                    <span class="tooltiptext">全戦略を組み合わせた場合の平均リターン。分散投資の効果を示します。</span>
+                                </span>
+                            </div>
                             <div class="metric-value {get_color_class(portfolio_metrics.get('portfolio_return', 0), 'return')}">{format_number(portfolio_metrics.get('portfolio_return', 0))}%</div>
                         </div>
                         <div class="metric-item">
-                            <div class="metric-label">ポートフォリオボラティリティ</div>
+                            <div class="metric-label">
+                                ポートフォリオボラティリティ
+                                <span class="tooltip">
+                                    <span class="help-icon">?</span>
+                                    <span class="tooltiptext">全戦略を組み合わせた場合のリスク（変動性）。低いほど安定です。</span>
+                                </span>
+                            </div>
                             <div class="metric-value neutral">{format_number(portfolio_metrics.get('portfolio_volatility', 0))}%</div>
                         </div>
                         <div class="metric-item">
-                            <div class="metric-label">ポートフォリオシャープ</div>
+                            <div class="metric-label">
+                                ポートフォリオシャープ
+                                <span class="tooltip">
+                                    <span class="help-icon">?</span>
+                                    <span class="tooltiptext">ポートフォリオ全体のリスク調整後収益率。1.0以上が良好です。</span>
+                                </span>
+                            </div>
                             <div class="metric-value {get_color_class(portfolio_metrics.get('portfolio_sharpe', 0), 'sharpe')}">{format_number(portfolio_metrics.get('portfolio_sharpe', 0))}</div>
                         </div>
                         <div class="metric-item">
-                            <div class="metric-label">分散効果スコア</div>
+                            <div class="metric-label">
+                                分散効果スコア
+                                <span class="tooltip">
+                                    <span class="help-icon">?</span>
+                                    <span class="tooltiptext">戦略間の相関が低いほど高くなるスコア。高いほど分散効果が期待できます。</span>
+                                </span>
+                            </div>
                             <div class="metric-value {get_color_class(portfolio_metrics.get('diversification_score', 0), 'return')}">{format_number(portfolio_metrics.get('diversification_score', 0))}</div>
                         </div>
                     </div>
