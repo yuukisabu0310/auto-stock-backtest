@@ -12,6 +12,12 @@ def build():
     """メインのビルド関数"""
     # Enhanced Dashboardのみを生成
     try:
+        import sys
+        import os
+        # scriptsディレクトリをパスに追加
+        scripts_dir = os.path.join(os.path.dirname(__file__), '..', 'scripts')
+        sys.path.insert(0, scripts_dir)
+        
         from enhanced_dashboard import generate_enhanced_dashboard_data
         from create_enhanced_dashboard import generate_enhanced_dashboard
         
@@ -33,6 +39,8 @@ def build():
             
     except Exception as e:
         print(f"Enhanced dashboard generation failed: {e}")
+        import traceback
+        traceback.print_exc()
     
     # ファイルリストも生成
     generate_file_list()
