@@ -19,6 +19,7 @@ def load_strategy_data(strategy_name: str) -> Dict[str, Any]:
     """戦略の詳細データを読み込み"""
     strategy_dir = ROOT / strategy_name
     if not strategy_dir.exists():
+        print(f"Strategy directory not found: {strategy_name}")
         return {}
     
     data = {
@@ -33,17 +34,25 @@ def load_strategy_data(strategy_name: str) -> Dict[str, Any]:
     # サマリーファイルを読み込み
     summary_file = strategy_dir / "_all_summary.csv"
     if summary_file.exists():
-        df = pd.read_csv(summary_file)
-        if not df.empty:
-            data['summary'] = {
-                'total_return': float(df.get('avg_return_%', [0]).iloc[0]) if 'avg_return_%' in df.columns else 0.0,
-                'sharpe_ratio': float(df.get('avg_sharpe', [0]).iloc[0]) if 'avg_sharpe' in df.columns else 0.0,
-                'max_drawdown': float(df.get('avg_max_dd_%', [0]).iloc[0]) if 'avg_max_dd_%' in df.columns else 0.0,
-                'win_rate': float(df.get('Win Rate [%]', [50]).iloc[0]) if 'Win Rate [%]' in df.columns else 50.0,
-                'profit_factor': float(df.get('Profit Factor', [1.0]).iloc[0]) if 'Profit Factor' in df.columns else 1.0,
-                'total_trades': int(df.get('trades_sum', [0]).iloc[0]) if 'trades_sum' in df.columns else 0,
-                'sample_size': len(df)
-            }
+        try:
+            df = pd.read_csv(summary_file)
+            if not df.empty:
+                data['summary'] = {
+                    'total_return': float(df.get('avg_return_%', [0]).iloc[0]) if 'avg_return_%' in df.columns else 0.0,
+                    'sharpe_ratio': float(df.get('avg_sharpe', [0]).iloc[0]) if 'avg_sharpe' in df.columns else 0.0,
+                    'max_drawdown': float(df.get('avg_max_dd_%', [0]).iloc[0]) if 'avg_max_dd_%' in df.columns else 0.0,
+                    'win_rate': float(df.get('Win Rate [%]', [50]).iloc[0]) if 'Win Rate [%]' in df.columns else 50.0,
+                    'profit_factor': float(df.get('Profit Factor', [1.0]).iloc[0]) if 'Profit Factor' in df.columns else 1.0,
+                    'total_trades': int(df.get('trades_sum', [0]).iloc[0]) if 'trades_sum' in df.columns else 0,
+                    'sample_size': len(df)
+                }
+                print(f"Loaded summary for {strategy_name}: {len(df)} records")
+            else:
+                print(f"Empty summary file for {strategy_name}")
+        except Exception as e:
+            print(f"Error loading summary for {strategy_name}: {e}")
+    else:
+        print(f"Summary file not found for {strategy_name}")
     
     # 個別銘柄のパフォーマンスを読み込み
     csv_files = glob.glob(str(strategy_dir / "*_OOS_walkforward_result.csv"))
@@ -154,7 +163,7 @@ def generate_enhanced_dashboard_data():
     # 戦略ランキング
     strategy_rankings = []
     for strategy_name, data in strategies_data.items():
-        if 'summary' in data:
+        if data and 'summary' in data and data['summary']:
             summary = data['summary']
             # 個別銘柄のトレード数を合計
             ticker_trades = sum([t.get('total_trades', 0) for t in data.get('ticker_performance', {}).values()])
@@ -192,7 +201,11 @@ def generate_enhanced_dashboard_data():
     ]
     
     # 実際にデータがある戦略と全戦略を区別
-    active_strategies = list(strategies_data.keys())
+    active_strategies = []
+    for strategy_name, data in strategies_data.items():
+        if data and 'summary' in data and data['summary']:
+            active_strategies.append(strategy_name)
+    
     total_tickers = len(set([h['ticker'] for h in heatmap_data]))
     total_trades = sum([s.get('total_trades', 0) for s in strategy_rankings])
     
