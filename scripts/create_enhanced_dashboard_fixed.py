@@ -77,6 +77,11 @@ def generate_enhanced_dashboard():
     portfolio_sharpe = portfolio_metrics.get('portfolio_sharpe', 0)
     diversification_score = portfolio_metrics.get('diversification_score', 0)
     
+    # チャート用のデータを準備
+    chart_labels = [f'"{s["name"]}"' for s in strategy_rankings[:8]]
+    chart_returns = [s['total_return'] for s in strategy_rankings[:8]]
+    chart_sharpe = [s['sharpe_ratio'] * 10 for s in strategy_rankings[:8]]
+    
     # HTMLテンプレート
     html_template = f"""
 <!DOCTYPE html>
@@ -635,16 +640,6 @@ def generate_enhanced_dashboard():
                                         </div>
                                         <div class="metric-item">
                                             <div class="metric-label">
-                                                トレード数
-                                                <span class="tooltip">
-                                                    <span class="help-icon">?</span>
-                                                    <span class="tooltiptext">期間中に実行された総トレード数。サンプルサイズの指標です。</span>
-                                                </span>
-                                            </div>
-                                            <div class="metric-value neutral">{ranking['total_trades']}</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">
                                                 サンプル数
                                                 <span class="tooltip">
                                                     <span class="help-icon">?</span>
@@ -782,7 +777,7 @@ def generate_enhanced_dashboard():
                             <div class="ticker-item">{ticker}</div>
 """
     
-    html_template += """
+    html_template += f"""
                         </div>
                     </div>
                 </div>
@@ -816,10 +811,10 @@ def generate_enhanced_dashboard():
         new Chart(ctx, {{
             type: 'radar',
             data: {{
-                labels: {[f'"{s["name"]}"' for s in strategy_rankings[:8]]},
+                labels: {chart_labels},
                 datasets: [{{
                     label: '総リターン (%)',
-                    data: {[s['total_return'] for s in strategy_rankings[:8]]},
+                    data: {chart_returns},
                     borderColor: 'rgba(102, 126, 234, 1)',
                     backgroundColor: 'rgba(102, 126, 234, 0.2)',
                     pointBackgroundColor: 'rgba(102, 126, 234, 1)',
@@ -828,7 +823,7 @@ def generate_enhanced_dashboard():
                     pointHoverBorderColor: 'rgba(102, 126, 234, 1)'
                 }}, {{
                     label: 'シャープレシオ',
-                    data: {[s['sharpe_ratio'] * 10 for s in strategy_rankings[:8]]},
+                    data: {chart_sharpe},
                     borderColor: 'rgba(118, 75, 162, 1)',
                     backgroundColor: 'rgba(118, 75, 162, 0.2)',
                     pointBackgroundColor: 'rgba(118, 75, 162, 1)',
