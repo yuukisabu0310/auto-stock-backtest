@@ -213,14 +213,13 @@ jobs:
         run: |
           python -m scripts.notify_ai_improvement
 
-      # 15. アーティファクト保存
+      # 15. アーティファクト保存（reports/は除外）
       - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ai-improvement-results
           path: |
-            reports/
             improvement_proposals.json
             evaluation_results.json
             data/improvement_history.json

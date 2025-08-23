@@ -81,4 +81,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backtest-reports
-          path: reports/
+          path: |
+            reports/index.html
+            reports/files.html
