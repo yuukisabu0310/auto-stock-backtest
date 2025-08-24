@@ -452,6 +452,74 @@
         .tab-content.active {
             display: block;
         }
+        
+        /* 改善履歴タブ用スタイル */
+        .improvement-overview {
+            margin-bottom: 30px;
+        }
+        
+        .strategy-improvements {
+            margin-bottom: 30px;
+        }
+        
+        .recent-improvements {
+            margin-bottom: 30px;
+        }
+        
+        .improvement-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .improvement-link {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        .improvement-link:hover {
+            transform: translateY(-2px);
+            text-decoration: none;
+            color: white;
+        }
+        
+        .link-icon {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        
+        .improvement-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .improvement-item.success {
+            border-left-color: #27ae60;
+        }
+        
+        .improvement-item.failed {
+            border-left-color: #e74c3c;
+        }
+        
+        .improvement-item.pending {
+            border-left-color: #f39c12;
+        }
     </style>
 </head>
 <body>
@@ -492,6 +560,7 @@
                         <button class="tab-button active" onclick="showTab('strategies')">戦略詳細</button>
                         <button class="tab-button" onclick="showTab('heatmap')">ヒートマップ</button>
                         <button class="tab-button" onclick="showTab('portfolio')">ポートフォリオ</button>
+                        <button class="tab-button" onclick="showTab('improvements')">改善履歴</button>
                     </div>
                     
                     <div id="strategies" class="tab-content active">
@@ -1437,6 +1506,68 @@
             </div>
         </div>
         
+        <div id="improvements" class="tab-content">
+            <div class="section">
+                <h2>🤖 AI改善履歴</h2>
+                <div class="improvement-overview">
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-label">総改善回数</div>
+                            <div class="metric-value neutral" id="total-improvements">-</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">採用済み改善</div>
+                            <div class="metric-value positive" id="adopted-improvements">-</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">改善成功率</div>
+                            <div class="metric-value neutral" id="success-rate">-</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">最新改善日</div>
+                            <div class="metric-value neutral" id="last-improvement">-</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>📊 戦略別改善状況</h3>
+                    <div class="strategy-improvements" id="strategy-improvements">
+                        <div class="loading">改善履歴を読み込み中...</div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>📈 最近の改善記録</h3>
+                    <div class="recent-improvements" id="recent-improvements">
+                        <div class="loading">最近の改善を読み込み中...</div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>🔗 詳細ページ</h3>
+                    <div class="improvement-links">
+                        <a href="improvement_history.html" class="improvement-link">
+                            <span class="link-icon">📋</span>
+                            完全な改善履歴
+                        </a>
+                        <a href="improvement_detailed.html" class="improvement-link">
+                            <span class="link-icon">📊</span>
+                            詳細分析
+                        </a>
+                        <a href="improvement_timeline.html" class="improvement-link">
+                            <span class="link-icon">📅</span>
+                            改善タイムライン
+                        </a>
+                        <a href="improvement_comparison.html" class="improvement-link">
+                            <span class="link-icon">⚖️</span>
+                            改善比較
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <div class="footer">
             <p>🚀 Enhanced Auto Stock Backtest Dashboard | 
             <a href="files.html">ファイル一覧</a> | 
@@ -1506,6 +1637,101 @@
                     }
                 }
             }
+        });
+        
+        // 改善履歴データを読み込み
+        async function loadImprovementData() {
+            try {
+                // 改善履歴ファイルを読み込み
+                const response = await fetch('data/improvement_history.json');
+                if (!response.ok) {
+                    throw new Error('改善履歴ファイルが見つかりません');
+                }
+                
+                const data = await response.json();
+                updateImprovementOverview(data);
+                updateStrategyImprovements(data);
+                updateRecentImprovements(data);
+                
+            } catch (error) {
+                console.log('改善履歴データの読み込みエラー:', error);
+                showNoImprovementData();
+            }
+        }
+        
+        function updateImprovementOverview(data) {
+            const total = data.length;
+            const adopted = data.filter(item => item.status === 'adopted').length;
+            const successRate = total > 0 ? Math.round((adopted / total) * 100) : 0;
+            const lastImprovement = data.length > 0 ? new Date(data[data.length - 1].timestamp).toLocaleDateString('ja-JP') : 'なし';
+            
+            document.getElementById('total-improvements').textContent = total;
+            document.getElementById('adopted-improvements').textContent = adopted;
+            document.getElementById('success-rate').textContent = successRate + '%';
+            document.getElementById('last-improvement').textContent = lastImprovement;
+        }
+        
+        function updateStrategyImprovements(data) {
+            const strategyStats = {};
+            
+            // 戦略別統計を計算
+            data.forEach(item => {
+                if (!strategyStats[item.strategy_name]) {
+                    strategyStats[item.strategy_name] = { total: 0, adopted: 0, failed: 0, pending: 0 };
+                }
+                strategyStats[item.strategy_name].total++;
+                strategyStats[item.strategy_name][item.status]++;
+            });
+            
+            const container = document.getElementById('strategy-improvements');
+            let html = '';
+            
+            Object.entries(strategyStats).forEach(([strategy, stats]) => {
+                const successRate = stats.total > 0 ? Math.round((stats.adopted / stats.total) * 100) : 0;
+                html += `
+                    <div class="improvement-item ${stats.adopted > 0 ? 'success' : stats.failed > 0 ? 'failed' : 'pending'}">
+                        <h4>${strategy}</h4>
+                        <p>総改善: ${stats.total} | 採用: ${stats.adopted} | 失敗: ${stats.failed} | 保留: ${stats.pending}</p>
+                        <p>成功率: ${successRate}%</p>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html || '<p>改善履歴がありません</p>';
+        }
+        
+        function updateRecentImprovements(data) {
+            const recent = data.slice(-5).reverse(); // 最新5件
+            const container = document.getElementById('recent-improvements');
+            let html = '';
+            
+            recent.forEach(item => {
+                const date = new Date(item.timestamp).toLocaleDateString('ja-JP');
+                const statusClass = item.status === 'adopted' ? 'success' : item.status === 'failed' ? 'failed' : 'pending';
+                html += `
+                    <div class="improvement-item ${statusClass}">
+                        <h4>${item.strategy_name} - ${item.description}</h4>
+                        <p>日時: ${date} | ステータス: ${item.status} | スコア: ${item.improvement_score.toFixed(4)}</p>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html || '<p>最近の改善記録がありません</p>';
+        }
+        
+        function showNoImprovementData() {
+            document.getElementById('total-improvements').textContent = '0';
+            document.getElementById('adopted-improvements').textContent = '0';
+            document.getElementById('success-rate').textContent = '0%';
+            document.getElementById('last-improvement').textContent = 'なし';
+            
+            document.getElementById('strategy-improvements').innerHTML = '<p>改善履歴データがありません</p>';
+            document.getElementById('recent-improvements').innerHTML = '<p>最近の改善記録がありません</p>';
+        }
+        
+        // ページ読み込み時に改善履歴データを読み込み
+        document.addEventListener('DOMContentLoaded', function() {
+            loadImprovementData();
         });
     </script>
 </body>
