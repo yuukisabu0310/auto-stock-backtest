@@ -39,9 +39,17 @@ class ImprovementHistoryManager:
     
     def __init__(self, history_file: str = "data/improvement_history.json"):
         self.history_file = Path(history_file)
+        self.performance_file = Path("data/performance_tracking.json")
+        self.analytics_file = Path("data/improvement_analytics.json")
+        
+        # ディレクトリ作成
         self.history_file.parent.mkdir(parents=True, exist_ok=True)
+        
         self.history: List[ImprovementRecord] = []
+        self.performance_tracking: Dict[str, List[Dict[str, Any]]] = {}
+        
         self.load_history()
+        self.load_performance_tracking()
     
     def load_history(self):
         """履歴ファイルから改善記録を読み込み"""
@@ -66,6 +74,28 @@ class ImprovementHistoryManager:
             logger.info("改善履歴を保存しました")
         except Exception as e:
             logger.error(f"履歴ファイルの保存エラー: {e}")
+    
+    def load_performance_tracking(self):
+        """パフォーマンス追跡データを読み込み"""
+        if self.performance_file.exists():
+            try:
+                with open(self.performance_file, 'r', encoding='utf-8') as f:
+                    self.performance_tracking = json.load(f)
+                logger.info(f"パフォーマンス追跡データを読み込み: {len(self.performance_tracking)}戦略")
+            except Exception as e:
+                logger.error(f"パフォーマンス追跡ファイルの読み込みエラー: {e}")
+                self.performance_tracking = {}
+        else:
+            self.performance_tracking = {}
+    
+    def save_performance_tracking(self):
+        """パフォーマンス追跡データを保存"""
+        try:
+            with open(self.performance_file, 'w', encoding='utf-8') as f:
+                json.dump(self.performance_tracking, f, indent=2, ensure_ascii=False, default=str)
+            logger.info("パフォーマンス追跡データを保存")
+        except Exception as e:
+            logger.error(f"パフォーマンス追跡ファイルの保存エラー: {e}")
     
     def _generate_id(self, strategy_name: str, params: Dict[str, Any]) -> str:
         """改善記録のIDを生成"""
@@ -225,6 +255,161 @@ class ImprovementHistoryManager:
         ]
         
         return summary
+    
+    def track_performance(self, strategy_name: str, metrics: Dict[str, float], improvement_id: Optional[str] = None):
+        """パフォーマンスを追跡記録"""
+        timestamp = datetime.now().isoformat()
+        
+        performance_entry = {
+            'timestamp': timestamp,
+            'metrics': metrics,
+            'improvement_id': improvement_id
+        }
+        
+        if strategy_name not in self.performance_tracking:
+            self.performance_tracking[strategy_name] = []
+        
+        self.performance_tracking[strategy_name].append(performance_entry)
+        
+        # 過去100回分のみ保持
+        self.performance_tracking[strategy_name] = self.performance_tracking[strategy_name][-100:]
+        
+        self.save_performance_tracking()
+        logger.info(f"パフォーマンス追跡記録: {strategy_name}")
+    
+    def get_performance_trend(self, strategy_name: str, metric: str = 'sharpe_ratio', window: int = 10) -> Dict[str, Any]:
+        """パフォーマンストレンドを分析"""
+        if strategy_name not in self.performance_tracking:
+            return {'trend': 'no_data', 'slope': 0, 'r_squared': 0}
+        
+        records = self.performance_tracking[strategy_name]
+        if len(records) < window:
+            return {'trend': 'insufficient_data', 'slope': 0, 'r_squared': 0}
+        
+        # 最新のwindow件のデータを取得
+        recent_records = records[-window:]
+        values = [r['metrics'].get(metric, 0) for r in recent_records]
+        
+        # 線形回帰で傾向を計算
+        x = list(range(len(values)))
+        try:
+            import numpy as np
+            from scipy import stats
+            
+            slope, intercept, r_value, p_value, std_err = stats.linregress(x, values)
+            r_squared = r_value ** 2
+            
+            if slope > 0.01:
+                trend = 'improving'
+            elif slope < -0.01:
+                trend = 'declining'
+            else:
+                trend = 'stable'
+            
+            return {
+                'trend': trend,
+                'slope': slope,
+                'r_squared': r_squared,
+                'p_value': p_value,
+                'recent_values': values
+            }
+        except ImportError:
+            # scipy が利用できない場合の簡易計算
+            if len(values) >= 3:
+                first_third = sum(values[:len(values)//3]) / (len(values)//3)
+                last_third = sum(values[-len(values)//3:]) / (len(values)//3)
+                slope = (last_third - first_third) / len(values)
+                
+                if slope > 0.01:
+                    trend = 'improving'
+                elif slope < -0.01:
+                    trend = 'declining'
+                else:
+                    trend = 'stable'
+                
+                return {
+                    'trend': trend,
+                    'slope': slope,
+                    'r_squared': 0,
+                    'recent_values': values
+                }
+            
+            return {'trend': 'insufficient_data', 'slope': 0, 'r_squared': 0}
+    
+    def get_performance_statistics(self, strategy_name: str) -> Dict[str, Any]:
+        """パフォーマンス統計を取得"""
+        if strategy_name not in self.performance_tracking:
+            return {}
+        
+        records = self.performance_tracking[strategy_name]
+        if not records:
+            return {}
+        
+        stats = {}
+        
+        # メトリクス別統計
+        metrics = set()
+        for record in records:
+            metrics.update(record['metrics'].keys())
+        
+        for metric in metrics:
+            values = [r['metrics'].get(metric, 0) for r in records if metric in r['metrics']]
+            if values:
+                stats[metric] = {
+                    'mean': sum(values) / len(values),
+                    'min': min(values),
+                    'max': max(values),
+                    'latest': values[-1],
+                    'trend': self.get_performance_trend(strategy_name, metric)['trend']
+                }
+        
+        return stats
+    
+    def generate_performance_analytics(self):
+        """パフォーマンス分析レポートを生成"""
+        analytics = {
+            'timestamp': datetime.now().isoformat(),
+            'strategies': {},
+            'overall_summary': {}
+        }
+        
+        all_strategies = list(self.performance_tracking.keys())
+        
+        for strategy_name in all_strategies:
+            strategy_stats = self.get_performance_statistics(strategy_name)
+            analytics['strategies'][strategy_name] = strategy_stats
+        
+        # 全体サマリー
+        if all_strategies:
+            # 最も改善している戦略
+            improving_strategies = []
+            declining_strategies = []
+            
+            for strategy_name in all_strategies:
+                trend = self.get_performance_trend(strategy_name)
+                if trend['trend'] == 'improving':
+                    improving_strategies.append((strategy_name, trend['slope']))
+                elif trend['trend'] == 'declining':
+                    declining_strategies.append((strategy_name, trend['slope']))
+            
+            analytics['overall_summary'] = {
+                'total_strategies': len(all_strategies),
+                'improving_strategies': len(improving_strategies),
+                'declining_strategies': len(declining_strategies),
+                'stable_strategies': len(all_strategies) - len(improving_strategies) - len(declining_strategies),
+                'top_improving': sorted(improving_strategies, key=lambda x: x[1], reverse=True)[:3],
+                'most_declining': sorted(declining_strategies, key=lambda x: x[1])[:3]
+            }
+        
+        # 分析結果を保存
+        try:
+            with open(self.analytics_file, 'w', encoding='utf-8') as f:
+                json.dump(analytics, f, indent=2, ensure_ascii=False, default=str)
+            logger.info("パフォーマンス分析レポートを生成")
+        except Exception as e:
+            logger.error(f"分析レポートの保存エラー: {e}")
+        
+        return analytics
     
     def can_rollback(self, strategy_name: str) -> bool:
         """ロールバック可能かチェック"""

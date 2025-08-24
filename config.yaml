@@ -44,6 +44,16 @@ backtest:
     improvement_score_threshold: 0.05  # 改善スコアの閾値
     enable_rollback: true  # ロールバック機能の有効化
 
+  # 動的最適化設定
+  dynamic_optimization:
+    enabled: "${DYNAMIC_OPTIMIZATION_ENABLED:-true}"  # 環境変数で切り替え可能
+    adaptation_rate: 0.1  # 基本適応率
+    performance_window: 20  # パフォーマンス履歴ウィンドウ
+    convergence_threshold: 0.02  # 収束判定閾値
+    min_samples: 10  # 最適化開始に必要な最小サンプル数
+    optimization_frequency: 5  # 何回のバックテストごとに最適化するか
+    max_parameter_change: 0.3  # 1回の最適化での最大パラメータ変更率
+
 # 戦略設定
 strategies:
   # 固定SMA戦略
@@ -184,6 +194,22 @@ strategies:
     enabled: "${OBV_ENABLED:-true}"  # 環境変数で切り替え可能
     parameters:
       obv_period: [20, 30, 50]
+    risk_management:
+      stop_loss_pct: 0.05
+      take_profit_pct: 0.10
+      max_position_size: 0.1
+      max_drawdown_limit: 0.25
+
+  # トレンドフォロー戦略
+  TrendFollowing:
+    enabled: "${TREND_FOLLOWING_ENABLED:-true}"  # 環境変数で切り替え可能
+    parameters:
+      sma_short: [15, 20, 25]
+      sma_medium: [40, 50, 60]
+      sma_long: [150, 200, 250]
+      atr_period: [14, 20]
+      volume_period: [20, 30]
+      adx_period: [14, 21]
     risk_management:
       stop_loss_pct: 0.05
       take_profit_pct: 0.10

@@ -1242,6 +1242,145 @@ class OBVStrategy(BaseStrategy):
             if self.obv[-1] < self.obv_sma[-1]:
                 self.position.close()
 
+class TrendFollowingStrategy(BaseStrategy):
+    """包括的トレンドフォロー戦略"""
+    
+    # パラメータ（クラス変数として定義）
+    n_fast = 20  # backtesting用
+    n_slow = 50  # backtesting用
+    sma_short = 20  # 短期移動平均
+    sma_medium = 50  # 中期移動平均
+    sma_long = 200  # 長期移動平均
+    atr_period = 14  # ATR期間
+    volume_period = 20  # 出来高移動平均期間
+    adx_period = 14  # ADX期間
+    
+    def _init_strategy_specific_indicators(self):
+        """指標の初期化"""
+        close = self.data.Close
+        high = self.data.High
+        low = self.data.Low
+        volume = self.data.Volume
+        
+        # 移動平均
+        self.sma_short = self.I(self._sma_indicator, close, self.sma_short)
+        self.sma_medium = self.I(self._sma_indicator, close, self.sma_medium)
+        self.sma_long = self.I(self._sma_indicator, close, self.sma_long)
+        
+        # ATR（ボラティリティ）
+        self.atr = self.I(self._atr_indicator, high, low, close, self.atr_period)
+        
+        # 出来高移動平均
+        self.volume_ma = self.I(self._sma_indicator, volume, self.volume_period)
+        
+        # ADX（トレンド強度）
+        self.adx = self.I(self._adx_indicator, high, low, close, self.adx_period)
+        
+    def _execute_strategy(self):
+        """トレンドフォロー戦略の実行"""
+        if not self._apply_common_filters():
+            return
+            
+        current_price = self.data.Close[-1]
+        
+        # ロングポジションがない場合
+        if not self.position.is_long:
+            # トレンド確認条件
+            trend_alignment = (
+                self.sma_short[-1] > self.sma_medium[-1] and  # 短期 > 中期
+                self.sma_medium[-1] > self.sma_long[-1] and   # 中期 > 長期
+                current_price > self.sma_short[-1]           # 価格 > 短期
+            )
+            
+            # トレンド強度確認
+            strong_trend = self.adx[-1] > 25  # ADX > 25でトレンド強い
+            
+            # 出来高確認
+            volume_support = self.data.Volume[-1] > self.volume_ma[-1] * 1.2
+            
+            # ブレイクアウト確認
+            price_breakout = current_price > max(
+                self.data.High[-5:-1]  # 過去4日の高値を上抜け
+            )
+            
+            # エントリー条件
+            if trend_alignment and strong_trend and (volume_support or price_breakout):
+                size = self._calculate_position_size()
+                self.buy(size=size)
+                
+        # ロングポジションがある場合
+        elif self.position.is_long:
+            # トレンド転換チェック
+            trend_reversal = (
+                current_price < self.sma_short[-1] or      # 価格が短期移動平均を下抜け
+                self.sma_short[-1] < self.sma_medium[-1]   # 短期が中期を下抜け
+            )
+            
+            # 弱いトレンド
+            weak_trend = self.adx[-1] < 20
+            
+            # エグジット条件
+            if trend_reversal or weak_trend:
+                self.position.close()
+    
+    def _adx_indicator(self, high, low, close, period):
+        """ADX指標の計算"""
+        try:
+            h_array = np.array(high)
+            l_array = np.array(low)
+            c_array = np.array(close)
+            
+            # +DI, -DIの計算
+            plus_dm = np.where(h_array[1:] - h_array[:-1] > l_array[:-1] - l_array[1:], 
+                              np.maximum(h_array[1:] - h_array[:-1], 0), 0)
+            minus_dm = np.where(l_array[:-1] - l_array[1:] > h_array[1:] - h_array[:-1], 
+                               np.maximum(l_array[:-1] - l_array[1:], 0), 0)
+            
+            # ATRの計算
+            tr = np.maximum(h_array[1:] - l_array[1:], 
+                           np.maximum(np.abs(h_array[1:] - c_array[:-1]), 
+                                     np.abs(l_array[1:] - c_array[:-1])))
+            
+            # 平滑化
+            atr_smooth = np.zeros_like(tr)
+            plus_di_smooth = np.zeros_like(plus_dm)
+            minus_di_smooth = np.zeros_like(minus_dm)
+            
+            for i in range(len(tr)):
+                if i < period - 1:
+                    atr_smooth[i] = np.nan
+                    plus_di_smooth[i] = np.nan
+                    minus_di_smooth[i] = np.nan
+                else:
+                    atr_smooth[i] = np.mean(tr[i-period+1:i+1])
+                    plus_di_smooth[i] = np.mean(plus_dm[i-period+1:i+1])
+                    minus_di_smooth[i] = np.mean(minus_dm[i-period+1:i+1])
+            
+            # +DI, -DIの計算
+            plus_di = 100 * plus_di_smooth / atr_smooth
+            minus_di = 100 * minus_di_smooth / atr_smooth
+            
+            # DXの計算
+            dx = 100 * np.abs(plus_di - minus_di) / (plus_di + minus_di + 1e-8)
+            
+            # ADXの計算（DXの移動平均）
+            adx = np.zeros_like(dx)
+            for i in range(len(dx)):
+                if i < period - 1:
+                    adx[i] = np.nan
+                else:
+                    adx[i] = np.mean(dx[i-period+1:i+1])
+            
+            # 先頭にNaNを追加して元の配列サイズに合わせる
+            result = np.full(len(high), np.nan)
+            result[1:] = adx
+            
+            return result
+            
+        except Exception as e:
+            logger.warning(f"ADX計算エラー: {e}")
+            return np.full(len(high), 25.0)  # デフォルト値
+
 class StrategyFactory:
     """戦略ファクトリークラス"""
     
@@ -1297,6 +1436,7 @@ def register_all_strategies():
         ("Squeeze", SqueezeStrategy),
         ("VolumeBreakout", VolumeBreakoutStrategy),
         ("OBV", OBVStrategy),
+        ("TrendFollowing", TrendFollowingStrategy),
     ]
     
     for name, strategy_class in strategies_to_register:
